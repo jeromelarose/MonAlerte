@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -30,14 +34,17 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import monalerte.composeapp.generated.resources.Res
 import monalerte.composeapp.generated.resources.compose_multiplatform
+import monalerte.composeapp.generated.resources.app_logo
 import org.jelarose.monalerte.core.components.Greeting
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TestScreenContent(
     uiState: TestUiState,
-    onToggleChanged: (Boolean) -> Unit,
+    onDataStoreToggleChanged: (Boolean) -> Unit,
+    onRoomToggleChanged: (Boolean) -> Unit,
     onShowContentChanged: (Boolean) -> Unit,
+    onTestApiCall: () -> Unit,
     onNavigateBack: () -> Unit = {}
 ) {
     Column(
@@ -58,9 +65,32 @@ fun TestScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            // Logo de l'application
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "MonAlerte - Application Logo",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Image(
+                        painter = painterResource(Res.drawable.app_logo),
+                        contentDescription = "Logo MonAlerte",
+                        modifier = Modifier.size(80.dp)
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
         
         // Card pour le toggle DataStore
         Card(
@@ -80,20 +110,103 @@ fun TestScreenContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Toggle persistant")
+                    Text("DataStore Toggle")
                     Switch(
-                        checked = uiState.toggleEnabled,
-                        onCheckedChange = onToggleChanged
+                        checked = uiState.dataStoreToggleEnabled,
+                        onCheckedChange = onDataStoreToggleChanged
                     )
                 }
                 
-                if (uiState.toggleEnabled) {
+                if (uiState.dataStoreToggleEnabled) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "✅ Toggle activé et sauvegardé !",
+                        text = "✅ DataStore Toggle activé !",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Card pour le toggle Room
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "Room Database Test",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Room Toggle")
+                    Switch(
+                        checked = uiState.roomToggleEnabled,
+                        onCheckedChange = onRoomToggleChanged
+                    )
+                }
+                
+                if (uiState.roomToggleEnabled) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "✅ Room Toggle activé et sauvegardé en BDD !",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Card pour le test API
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = "API Test (Ktor)",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Button(
+                    onClick = onTestApiCall,
+                    enabled = !uiState.isLoadingApi,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (uiState.isLoadingApi) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
+                            Text("Loading...")
+                        }
+                    } else {
+                        Text("Tester API (JSONPlaceholder)")
+                    }
+                }
+                
+                if (uiState.apiTestResult.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = uiState.apiTestResult,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
                 }
             }
         }
@@ -126,15 +239,12 @@ fun TestScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
-    // Charger l'état au démarrage (équivalent à onResume)
-    LaunchedEffect(Unit) {
-        viewModel.loadToggleState()
-    }
-    
     TestScreenContent(
         uiState = uiState,
-        onToggleChanged = { viewModel.onToggleChanged(it) },
+        onDataStoreToggleChanged = { viewModel.onDataStoreToggleChanged(it) },
+        onRoomToggleChanged = { viewModel.onRoomToggleChanged(it) },
         onShowContentChanged = { viewModel.onShowContentChanged(it) },
+        onTestApiCall = { viewModel.testApiCall() },
         onNavigateBack = onNavigateBack
     )
 }
@@ -144,9 +254,17 @@ fun TestScreen(
 fun TestScreenPreview() {
     MaterialTheme {
         TestScreenContent(
-            uiState = TestUiState(toggleEnabled = true, showContent = false),
-            onToggleChanged = {},
-            onShowContentChanged = {}
+            uiState = TestUiState(
+                dataStoreToggleEnabled = true, 
+                roomToggleEnabled = false, 
+                showContent = false,
+                apiTestResult = "✅ Test API réussi!",
+                isLoadingApi = false
+            ),
+            onDataStoreToggleChanged = {},
+            onRoomToggleChanged = {},
+            onShowContentChanged = {},
+            onTestApiCall = {}
         )
     }
 }

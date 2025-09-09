@@ -5,20 +5,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jelarose.monalerte.core.di.koinInject
 import org.jelarose.monalerte.core.navigation.Screen
 import org.jelarose.monalerte.core.navigation.StableNavController
 import org.jelarose.monalerte.core.navigation.rememberStableNavController
 import org.jelarose.monalerte.core.theme.MonAlerteTheme
 import org.jelarose.monalerte.features.test.presentation.TestScreen
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
-import org.jelarose.monalerte.core.di.AppContainer
+import org.jelarose.monalerte.core.di.initializeKoin
 
 @Composable
 @Preview
 fun App() {
+    // Initialise Koin pour iOS (ne fait rien sur Android)
+    LaunchedEffect(Unit) {
+        initializeKoin()
+    }
+    
     val navController = rememberStableNavController()
     
     MonAlerteTheme {
@@ -40,7 +47,7 @@ fun AppNavHost(
         }
         
         Screen.Test -> {
-            val testViewModel = AppContainer.testViewModel
+            val testViewModel: TestViewModel = koinInject()
             TestScreen(
                 viewModel = testViewModel,
                 onNavigateBack = {

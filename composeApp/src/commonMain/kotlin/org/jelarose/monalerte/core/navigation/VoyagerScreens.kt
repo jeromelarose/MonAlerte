@@ -122,6 +122,16 @@ object LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val authViewModel: SharedAuthViewModel = koinInject()
         
+        // Vérifier si l'utilisateur est déjà connecté au démarrage
+        LaunchedEffect(Unit) {
+            authViewModel.checkExistingAuthentication { isAuthenticated ->
+                if (isAuthenticated) {
+                    // Si déjà connecté, aller directement au menu principal
+                    navigator.replace(InterfaceMenuVoyagerScreen)
+                }
+            }
+        }
+        
         SharedLoginScreen(
             viewModel = authViewModel,
             onLoginSuccess = { 

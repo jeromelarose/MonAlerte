@@ -377,20 +377,6 @@ class SharedAuthViewModel(
         _confirmPassword.value = ""
         clearErrors()
     }
-    
-    /**
-     * Check if user has valid stored authentication
-     */
-    suspend fun hasValidStoredAuth(): Boolean {
-        return try {
-            val hasValid = authRepository.hasValidToken()
-            logger.d("Has valid stored auth: $hasValid")
-            hasValid
-        } catch (e: Exception) {
-            logger.e("Error checking stored auth: ${e.message}")
-            false
-        }
-    }
 
     fun clearErrors() {
         _errorMessage.value = null
@@ -450,6 +436,60 @@ class SharedAuthViewModel(
             } catch (e: Exception) {
                 logger.e("Error during logout: ${e.message}")
             }
+        }
+    }
+
+    // Check if user is already authenticated
+    fun checkExistingAuthentication(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                logger.d("Checking existing authentication...")
+                
+                // Check if we have a valid token stored
+                val storedToken = authRepository.getAuthToken()
+                val storedEmail = authRepository.getUserEmail()
+                
+                if (!storedToken.isNullOrEmpty() && !storedEmail.isNullOrEmpty()) {
+                    logger.i("Found stored authentication for: $storedEmail")
+                    
+                    // Verify the token is still valid with the server
+                    authRepository.verifyToken(null)
+                        .onSuccess {
+                            logger.i("Stored token is valid, user is authenticated")
+                            _jwtToken.value = storedToken
+                            _email.value = storedEmail
+                            _authState.value = AuthState.Success(
+                                token = storedToken,
+                                message = "Session restaurée"
+                            )
+                            onResult(true)
+                        }
+                        .onFailure { error ->
+                            logger.w("Stored token is invalid: ${error.message}")
+                            // Clear invalid token
+                            authRepository.clearAuthToken()
+                            onResult(false)
+                        }
+                } else {
+                    logger.d("No stored authentication found")
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                logger.e("Error checking existing authentication: ${e.message}")
+                onResult(false)
+            }
+        }
+    }
+    
+    // Alternative synchronous check for stored auth (without server verification)
+    suspend fun hasValidStoredAuth(): Boolean {
+        return try {
+            val token = authRepository.getAuthToken()
+            val email = authRepository.getUserEmail()
+            !token.isNullOrEmpty() && !email.isNullOrEmpty()
+        } catch (e: Exception) {
+            logger.e("Error checking stored auth: ${e.message}")
+            false
         }
     }
 

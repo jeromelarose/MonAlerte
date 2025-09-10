@@ -45,20 +45,26 @@ fun TestScreenContent(
     onRoomToggleChanged: (Boolean) -> Unit,
     onShowContentChanged: (Boolean) -> Unit,
     onTestApiCall: () -> Unit,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    showBackButton: Boolean = true,
+    backButtonText: String = "←"
 ) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
     ) {
-        // TopAppBar avec bouton retour
+        // TopAppBar avec bouton retour optionnel
         TopAppBar(
             title = { Text("Test Screen") },
-            navigationIcon = {
-                IconButton(onClick = onNavigateBack) {
-                    Text("←") // Simple arrow text for KMP compatibility
+            navigationIcon = if (showBackButton) {
+                {
+                    IconButton(onClick = onNavigateBack) {
+                        Text(backButtonText) // Texte personnalisable 
+                    }
                 }
+            } else {
+                {}
             }
         )
         
@@ -235,7 +241,9 @@ fun TestScreenContent(
 @Composable
 fun TestScreen(
     viewModel: TestViewModel,
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    showBackButton: Boolean = true,
+    backButtonText: String = "←" // Texte personnalisable pour le bouton
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     
@@ -245,7 +253,9 @@ fun TestScreen(
         onRoomToggleChanged = { viewModel.onRoomToggleChanged(it) },
         onShowContentChanged = { viewModel.onShowContentChanged(it) },
         onTestApiCall = { viewModel.testApiCall() },
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        showBackButton = showBackButton,
+        backButtonText = backButtonText
     )
 }
 
@@ -264,7 +274,10 @@ fun TestScreenPreview() {
             onDataStoreToggleChanged = {},
             onRoomToggleChanged = {},
             onShowContentChanged = {},
-            onTestApiCall = {}
+            onTestApiCall = {},
+            onNavigateBack = {},
+            showBackButton = true,
+            backButtonText = "←"
         )
     }
 }

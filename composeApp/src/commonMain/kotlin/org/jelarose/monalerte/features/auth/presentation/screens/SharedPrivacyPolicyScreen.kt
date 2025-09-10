@@ -20,6 +20,10 @@ fun SharedPrivacyPolicyScreen(
 ) {
     val requiredPolicyVersion = PolicyManager.CURRENT_POLICY_VERSION
     val privacyPolicyUrl = "https://51.75.120.88.nip.io/politique-confidentialite/$requiredPolicyVersion"
+    
+    // Debug logging pour vérifier l'URL des politiques
+    println("SharedPrivacyPolicyScreen - Policy Version: $requiredPolicyVersion")
+    println("SharedPrivacyPolicyScreen - Policy URL: $privacyPolicyUrl")
 
     Scaffold(
         bottomBar = {

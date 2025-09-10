@@ -36,6 +36,7 @@ fun App() {
     }
 }
 
+@Deprecated("Migration vers Voyager terminée, utiliser AppNavigationHost() à la place")
 @Composable
 fun AppNavHost(
     navController: StableNavController

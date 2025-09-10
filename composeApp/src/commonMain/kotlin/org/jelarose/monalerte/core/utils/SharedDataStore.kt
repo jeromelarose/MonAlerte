@@ -9,8 +9,11 @@ import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
+import co.touchlab.kermit.Logger
 
 class SharedDataStore(private val dataStore: DataStore<Preferences>) {
+    
+    private val logger = Logger.withTag("SharedDataStore")
     
     companion object {
         val TOGGLE_KEY = booleanPreferencesKey("test_toggle")
@@ -44,17 +47,32 @@ class SharedDataStore(private val dataStore: DataStore<Preferences>) {
     
     // Int operations
     suspend fun putInt(key: String, value: Int) {
-        val preferencesKey = intPreferencesKey(key)
-        dataStore.edit { preferences ->
-            preferences[preferencesKey] = value
+        try {
+            logger.d { "Storing int: $key = $value" }
+            val preferencesKey = intPreferencesKey(key)
+            dataStore.edit { preferences ->
+                preferences[preferencesKey] = value
+            }
+            logger.d { "Successfully stored int: $key = $value" }
+        } catch (e: Exception) {
+            logger.e(e) { "Error storing int: $key = $value" }
+            throw e
         }
     }
     
     suspend fun getInt(key: String, defaultValue: Int = 0): Int {
-        val preferencesKey = intPreferencesKey(key)
-        return dataStore.data.map { preferences ->
-            preferences[preferencesKey] ?: defaultValue
-        }.first()
+        return try {
+            logger.d { "Retrieving int: $key (default: $defaultValue)" }
+            val preferencesKey = intPreferencesKey(key)
+            val result = dataStore.data.map { preferences ->
+                preferences[preferencesKey] ?: defaultValue
+            }.first()
+            logger.d { "Retrieved int: $key = $result" }
+            result
+        } catch (e: Exception) {
+            logger.e(e) { "Error retrieving int: $key, returning default: $defaultValue" }
+            defaultValue
+        }
     }
     
     // Remove key

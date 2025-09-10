@@ -29,7 +29,11 @@ class PolicyManager(
     suspend fun checkPolicyStatus() {
         try {
             logger.d { "Checking policy status..." }
-            _policyState.value = PolicyState.Loading
+            
+            // Only set to Loading if not already Accepted to avoid state regression
+            if (_policyState.value !is PolicyState.Accepted) {
+                _policyState.value = PolicyState.Loading
+            }
             
             val acceptedVersion = getAcceptedPolicyVersion()
             logger.d { "Current accepted version: $acceptedVersion, required: $CURRENT_POLICY_VERSION" }
@@ -54,8 +58,18 @@ class PolicyManager(
         try {
             logger.i { "Accepting policy version $CURRENT_POLICY_VERSION" }
             sharedDataStore.putInt(POLICY_VERSION_KEY, CURRENT_POLICY_VERSION)
-            _policyState.value = PolicyState.Accepted
-            logger.i { "Policy accepted successfully" }
+            
+            // Vérification immédiate pour debugging iOS
+            val savedVersion = sharedDataStore.getInt(POLICY_VERSION_KEY, defaultValue = 0)
+            logger.i { "Policy saved and immediately verified: saved=$savedVersion, expected=$CURRENT_POLICY_VERSION" }
+            
+            if (savedVersion == CURRENT_POLICY_VERSION) {
+                _policyState.value = PolicyState.Accepted
+                logger.i { "Policy accepted successfully and verified in storage" }
+            } else {
+                logger.w { "Policy save verification failed: saved=$savedVersion vs expected=$CURRENT_POLICY_VERSION" }
+                _policyState.value = PolicyState.Accepted // Still accept to avoid blocking user
+            }
         } catch (e: Exception) {
             logger.e(e) { "Error accepting policy" }
         }
@@ -66,7 +80,9 @@ class PolicyManager(
      */
     private suspend fun getAcceptedPolicyVersion(): Int {
         return try {
-            sharedDataStore.getInt(POLICY_VERSION_KEY) ?: 0
+            val version = sharedDataStore.getInt(POLICY_VERSION_KEY, defaultValue = 0)
+            logger.d { "Retrieved policy version from storage: $version" }
+            version
         } catch (e: Exception) {
             logger.e(e) { "Error getting accepted policy version" }
             0
@@ -85,5 +101,32 @@ class PolicyManager(
      */
     suspend fun getAcceptedPolicyVersionForApi(): Int {
         return if (isPolicyAccepted()) CURRENT_POLICY_VERSION else 0
+    }
+    
+    /**
+     * Debug method to force check and log policy status
+     * Useful for iOS debugging
+     */
+    suspend fun debugPolicyStatus(): String {
+        return try {
+            val storedVersion = getAcceptedPolicyVersion()
+            val requiredVersion = CURRENT_POLICY_VERSION
+            val isAccepted = storedVersion >= requiredVersion
+            val debugInfo = """
+                |Policy Debug Status:
+                |  Stored version: $storedVersion
+                |  Required version: $requiredVersion
+                |  Is accepted: $isAccepted
+                |  Current state: ${_policyState.value}
+                |  Storage key: $POLICY_VERSION_KEY
+            """.trimMargin()
+            
+            logger.i { debugInfo }
+            debugInfo
+        } catch (e: Exception) {
+            val errorInfo = "Policy debug error: ${e.message}"
+            logger.e(e) { errorInfo }
+            errorInfo
+        }
     }
 }

@@ -18,6 +18,7 @@ import org.jelarose.monalerte.features.auth.domain.usecases.ForgotPasswordUseCas
 import org.jelarose.monalerte.features.auth.domain.usecases.GetAuthTokenUseCase
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.AuthViewModel
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
+import org.jelarose.monalerte.features.auth.presentation.viewmodels.AccountViewModel
 import org.jelarose.monalerte.core.utils.LanguageManager
 import org.jelarose.monalerte.core.policy.PolicyManager
 import org.jelarose.monalerte.core.storage.SecureStorage
@@ -93,4 +94,5 @@ val appModule = module {
     factory { TestViewModel(get(), get(), get()) }
     factory { AuthViewModel(get(), get(), get(), get()) }
     factory { SharedAuthViewModel(get(), get(), get(), get(), get()) }
+    factory { AccountViewModel(get<AuthRepositoryImpl>(), get()) }
 }

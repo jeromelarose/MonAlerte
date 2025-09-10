@@ -146,4 +146,24 @@
     <string name="settings_notifications_description">Configure notification preferences.</string>
     <string name="settings_privacy_policy_title">Privacy Policy</string>
     <string name="settings_privacy_policy_description">View our privacy policy.</string>
+
+    <!-- Account Screen -->
+    <string name="auth_old_password">Current password</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="loading">Loading…</string>
+    
+    <!-- Password Change Dialog -->
+    <string name="settings_change_password_dialog_title">Change Password</string>
+    <string name="settings_old_password_label">Current password</string>
+    
+    <!-- Language Settings -->
+    <string name="language_settings_title">Language Settings</string>
+    <string name="language_settings_description">Choose application language</string>
+    <string name="language_current_selection">Current language: %1$s</string>
+    <string name="user_not_connected">User not connected</string>
+    
+    <!-- API Messages - Account specific -->
+    <string name="auth_change_password_success">Password changed successfully!</string>
+    <string name="auth_change_password_error">Error changing password</string>
+    <string name="auth_logout_success">Logout successful</string>
 </resources>

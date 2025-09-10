@@ -146,4 +146,24 @@
     <string name="settings_notifications_description">Configurer les préférences de notification.</string>
     <string name="settings_privacy_policy_title">Politique de Confidentialité</string>
     <string name="settings_privacy_policy_description">Consulter notre politique de confidentialité.</string>
+
+    <!-- Account Screen -->
+    <string name="auth_old_password">Ancien mot de passe</string>
+    <string name="common_cancel">Annuler</string>
+    <string name="loading">Chargement…</string>
+    
+    <!-- Password Change Dialog -->
+    <string name="settings_change_password_dialog_title">Changer le mot de passe</string>
+    <string name="settings_old_password_label">Ancien mot de passe</string>
+    
+    <!-- Language Settings -->
+    <string name="language_settings_title">Paramètres de langue</string>
+    <string name="language_settings_description">Choisir la langue de l'application</string>
+    <string name="language_current_selection">Langue actuelle : %1$s</string>
+    <string name="user_not_connected">Utilisateur non connecté</string>
+    
+    <!-- API Messages - Account specific -->
+    <string name="auth_change_password_success">Mot de passe changé avec succès!</string>
+    <string name="auth_change_password_error">Erreur lors du changement de mot de passe</string>
+    <string name="auth_logout_success">Déconnexion réussie</string>
 </resources>

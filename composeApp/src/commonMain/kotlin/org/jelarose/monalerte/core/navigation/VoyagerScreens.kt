@@ -16,7 +16,9 @@ import org.jelarose.monalerte.features.auth.presentation.screens.SharedForgotPas
 import org.jelarose.monalerte.features.test.presentation.TestScreen
 import org.jelarose.monalerte.features.home.presentation.screens.InterfaceMenuScreen
 import org.jelarose.monalerte.features.settings.presentation.SettingsScreen
+import org.jelarose.monalerte.features.auth.presentation.screens.AccountScreen
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
+import org.jelarose.monalerte.features.auth.presentation.viewmodels.AccountViewModel
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
 import org.jelarose.monalerte.core.policy.PolicyManager
 import org.jelarose.monalerte.core.policy.PolicyState
@@ -251,8 +253,7 @@ object SettingsScreen : Screen {
                 navigator.pop()
             },
             onAccountClick = { 
-                // TODO: Navigation vers écran de compte
-                navigator.push(TestScreen)
+                navigator.push(AccountVoyagerScreen)
             },
             onEmergencyContactsClick = { 
                 // TODO: Navigation vers écran contacts d'urgence
@@ -281,6 +282,24 @@ object SettingsScreen : Screen {
             onPrivacyPolicyClick = { 
                 // Réutiliser l'écran de politique de confidentialité existant
                 navigator.push(PrivacyPolicyScreen)
+            }
+        )
+    }
+}
+
+object AccountVoyagerScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val accountViewModel: AccountViewModel = koinInject()
+        
+        AccountScreen(
+            viewModel = accountViewModel,
+            onBackClick = { 
+                navigator.pop()
+            },
+            onLogoutSuccess = {
+                navigator.replaceAll(StartupScreen)
             }
         )
     }

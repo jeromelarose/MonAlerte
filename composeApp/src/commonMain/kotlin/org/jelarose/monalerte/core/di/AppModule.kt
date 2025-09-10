@@ -21,6 +21,7 @@ import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthVi
 import org.jelarose.monalerte.core.utils.LanguageManager
 import org.jelarose.monalerte.core.policy.PolicyManager
 import org.jelarose.monalerte.core.storage.SecureStorage
+import org.jelarose.monalerte.features.auth.data.store.SmartAuthCache
 import io.ktor.client.*
 
 /**
@@ -57,14 +58,29 @@ val appModule = module {
     // Authentication - API Service
     single<AuthApiService> { AuthApiService(get()) }
     
-    // Authentication - Repository
+    // Authentication - Smart Cache (Cache intelligent)
+    single { SmartAuthCache(get(), get<AppDatabase>().authDao()) }
+    
+    // Authentication - Repository (avec Smart Cache)
     single<AuthRepository> { 
-        AuthRepositoryImpl(get<AuthApiService>(), get<AppDatabase>().authDao(), get<SharedDataStore>(), get<SecureStorage>()) 
+        AuthRepositoryImpl(
+            get<AuthApiService>(), 
+            get<AppDatabase>().authDao(), 
+            get<SharedDataStore>(), 
+            get<SecureStorage>(),
+            get<SmartAuthCache>() // Cache intelligent
+        ) 
     }
     
     // Also register AuthRepositoryImpl directly for cases where it's needed
     single<AuthRepositoryImpl> { 
-        AuthRepositoryImpl(get<AuthApiService>(), get<AppDatabase>().authDao(), get<SharedDataStore>(), get<SecureStorage>()) 
+        AuthRepositoryImpl(
+            get<AuthApiService>(), 
+            get<AppDatabase>().authDao(), 
+            get<SharedDataStore>(), 
+            get<SecureStorage>(),
+            get<SmartAuthCache>() // Cache intelligent
+        ) 
     }
     
     // Authentication - Use Cases

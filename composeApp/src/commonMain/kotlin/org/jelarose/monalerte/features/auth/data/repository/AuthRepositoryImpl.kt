@@ -10,14 +10,19 @@ import org.jelarose.monalerte.features.auth.data.database.AuthTokenEntity
 import org.jelarose.monalerte.features.auth.domain.models.*
 import org.jelarose.monalerte.features.auth.domain.repository.AuthRepository
 import org.jelarose.monalerte.features.auth.data.api.AuthException
+import org.jelarose.monalerte.features.auth.data.store.SmartAuthCache
 import kotlinx.datetime.Clock
+import co.touchlab.kermit.Logger
 
 class AuthRepositoryImpl(
     private val authApiService: AuthApiService,
     private val authDao: AuthDao,
     private val sharedDataStore: SharedDataStore,
-    private val secureStorage: SecureStorage
+    private val secureStorage: SecureStorage,
+    private val smartAuthCache: SmartAuthCache? = null // Cache intelligent optionnel
 ) : AuthRepository {
+    
+    private val logger = Logger.withTag("AuthRepositoryImpl")
     
     companion object {
         private const val KEY_USER_EMAIL = "user_email"
@@ -92,14 +97,29 @@ class AuthRepositoryImpl(
         }
     }
     
-    // Local storage operations - Room Database + Secure Storage
+    // Local storage operations - Store 5 + Fallbacks
     override suspend fun saveAuthToken(token: String, userEmail: String) {
-        // Sauvegarder d'abord dans le stockage sécurisé (priorité)
+        logger.d { "Saving auth token for user: $userEmail" }
+        
+        // Utiliser SmartAuthCache en priorité si disponible
+        smartAuthCache?.let { cache ->
+            try {
+                logger.d { "Using SmartAuthCache for token storage" }
+                // SmartAuthCache gère automatiquement Memory + SecureStorage + Room
+                cache.saveToken(KEY_JWT_TOKEN, token, userEmail)
+                return
+            } catch (e: Exception) {
+                logger.e(e) { "Failed to use SmartAuthCache, falling back to manual storage" }
+            }
+        }
+        
+        // Fallback: méthode manuelle existante
+        logger.d { "Using manual token storage (SmartAuthCache not available)" }
         try {
             secureStorage.store(KEY_JWT_TOKEN, token)
             secureStorage.store(KEY_USER_EMAIL, userEmail)
         } catch (e: Exception) {
-            // En cas d'erreur, continuer avec les anciens systèmes
+            logger.w(e) { "Failed to use secure storage, continuing with Room" }
         }
         
         // Conserver aussi l'ancienne méthode pour compatibilité
@@ -112,7 +132,18 @@ class AuthRepositoryImpl(
     }
     
     override suspend fun getAuthToken(): String? {
-        // Priorité: Stockage sécurisé > Room > DataStore
+        // Utiliser SmartAuthCache en priorité si disponible
+        smartAuthCache?.let { cache ->
+            try {
+                logger.d { "Reading auth token from SmartAuthCache" }
+                return cache.getToken(KEY_JWT_TOKEN)
+            } catch (e: Exception) {
+                logger.e(e) { "Failed to read from SmartAuthCache, falling back to manual retrieval" }
+            }
+        }
+        
+        // Fallback: méthode manuelle existante
+        logger.d { "Using manual token retrieval (SmartAuthCache not available)" }
         return try {
             secureStorage.retrieve(KEY_JWT_TOKEN)?.takeIf { it.isNotEmpty() }
         } catch (e: Exception) {
@@ -132,12 +163,32 @@ class AuthRepositoryImpl(
     }
     
     override suspend fun clearAuthToken() {
-        // Nettoyer tous les stockages pour sécurité maximale
+        logger.d { "Clearing auth token from all sources" }
+        
+        // Utiliser SmartAuthCache en priorité si disponible
+        smartAuthCache?.let { cache ->
+            try {
+                logger.d { "Clearing auth token using SmartAuthCache" }
+                // SmartAuthCache gère automatiquement le nettoyage de tous les niveaux
+                cache.clearAllTokens()
+                
+                // Nettoyer aussi DataStore pour compatibilité
+                sharedDataStore.removeKey(KEY_JWT_TOKEN)
+                sharedDataStore.removeKey(KEY_USER_EMAIL)
+                sharedDataStore.removeKey(KEY_USER_ID)
+                return
+            } catch (e: Exception) {
+                logger.e(e) { "Failed to clear using SmartAuthCache, falling back to manual clearing" }
+            }
+        }
+        
+        // Fallback: méthode manuelle existante
+        logger.d { "Using manual token clearing (SmartAuthCache not available)" }
         try {
             secureStorage.remove(KEY_JWT_TOKEN)
             secureStorage.remove(KEY_USER_EMAIL)
         } catch (e: Exception) {
-            // Continuer même si le stockage sécurisé échoue
+            logger.w(e) { "Failed to clear from secure storage" }
         }
         
         // Nettoyer aussi les anciens systèmes

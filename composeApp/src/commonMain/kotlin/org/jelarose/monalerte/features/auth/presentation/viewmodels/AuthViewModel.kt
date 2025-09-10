@@ -12,6 +12,7 @@ import org.jelarose.monalerte.features.auth.domain.usecases.LoginUseCase
 import org.jelarose.monalerte.features.auth.domain.usecases.RegisterUseCase
 import org.jelarose.monalerte.features.auth.domain.usecases.ForgotPasswordUseCase
 import org.jelarose.monalerte.features.auth.domain.usecases.GetAuthTokenUseCase
+import org.jelarose.monalerte.core.validation.AuthValidationUtils
 
 data class AuthUiState(
     val isLoading: Boolean = false,
@@ -69,7 +70,7 @@ class AuthViewModel(
     fun onPasswordChanged(password: String) {
         _uiState.value = _uiState.value.copy(
             password = password,
-            isPasswordValid = password.length >= 8,
+            isPasswordValid = AuthValidationUtils.isValidPasswordLength(password),
             errorMessage = null
         )
     }
@@ -209,70 +210,41 @@ class AuthViewModel(
         val email = _uiState.value.email
         val password = _uiState.value.password
 
-        when {
-            email.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "L'email est requis")
-                return false
-            }
-            !isValidEmail(email) -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Format d'email invalide")
-                return false
-            }
-            password.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Le mot de passe est requis")
-                return false
-            }
+        // Utilisation de la nouvelle validation Konform
+        val errorMessage = AuthValidationUtils.validateLogin(email, password)
+        
+        return if (errorMessage != null) {
+            _uiState.value = _uiState.value.copy(errorMessage = errorMessage)
+            false
+        } else {
+            true
         }
-        return true
     }
 
     private fun validateRegisterInputs(): Boolean {
-        val email = _uiState.value.email
-        val password = _uiState.value.password
-        val confirmPassword = _uiState.value.confirmPassword
-        val firstName = _uiState.value.firstName
-        val lastName = _uiState.value.lastName
-        val phoneNumber = _uiState.value.phoneNumber
-
-        when {
-            email.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "L'email est requis")
-                return false
-            }
-            !isValidEmail(email) -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Format d'email invalide")
-                return false
-            }
-            password.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Le mot de passe est requis")
-                return false
-            }
-            password.length < 8 -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Le mot de passe doit contenir au moins 8 caractères")
-                return false
-            }
-            password != confirmPassword -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Les mots de passe ne correspondent pas")
-                return false
-            }
-            firstName.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Le prénom est requis")
-                return false
-            }
-            lastName.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Le nom est requis")
-                return false
-            }
-            phoneNumber.isBlank() -> {
-                _uiState.value = _uiState.value.copy(errorMessage = "Le numéro de téléphone est requis")
-                return false
-            }
+        val state = _uiState.value
+        
+        // Utilisation de la nouvelle validation Konform
+        val errorMessage = AuthValidationUtils.validateRegister(
+            email = state.email,
+            password = state.password,
+            confirmPassword = state.confirmPassword,
+            firstName = state.firstName,
+            lastName = state.lastName,
+            phoneNumber = state.phoneNumber
+        )
+        
+        return if (errorMessage != null) {
+            _uiState.value = _uiState.value.copy(errorMessage = errorMessage)
+            false
+        } else {
+            true
         }
-        return true
     }
 
     private fun isValidEmail(email: String): Boolean {
-        return email.contains("@") && email.contains(".")
+        // Utilisation de la nouvelle validation Konform - compatible avec l'ancienne API
+        return AuthValidationUtils.isValidEmail(email)
     }
 
     private fun getErrorMessage(code: ApiErrorCode): String {

@@ -24,6 +24,7 @@ kotlinx-datetime = "0.6.1"
 kermit = "2.0.4"
 kotest = "5.9.1"
 turbine = "1.1.0"
+konform = "0.11.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -57,6 +58,7 @@ kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+konform = { module = "io.konform:konform", version.ref = "konform" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

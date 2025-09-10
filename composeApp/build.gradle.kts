@@ -54,6 +54,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kermit)
+            implementation(libs.konform)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

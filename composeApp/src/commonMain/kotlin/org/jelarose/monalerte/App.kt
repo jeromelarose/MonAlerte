@@ -16,16 +16,19 @@ import org.jelarose.monalerte.core.navigation.rememberStableNavController
 import org.jelarose.monalerte.core.theme.MonAlerteTheme
 import org.jelarose.monalerte.features.test.presentation.TestScreen
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
-import org.jelarose.monalerte.core.di.initializeKoin
+import org.jelarose.monalerte.features.auth.presentation.screens.SharedLoginScreen
+import org.jelarose.monalerte.features.auth.presentation.screens.SharedRegisterScreen
+import org.jelarose.monalerte.features.auth.presentation.screens.SharedForgotPasswordScreen
+import org.jelarose.monalerte.features.auth.presentation.screens.SharedPrivacyPolicyScreen
+import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
+import org.jelarose.monalerte.core.policy.PolicyManager
+import androidx.compose.runtime.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 @Composable
 @Preview
 fun App() {
-    // Initialise Koin pour iOS (ne fait rien sur Android)
-    LaunchedEffect(Unit) {
-        initializeKoin()
-    }
-    
     val navController = rememberStableNavController()
     
     MonAlerteTheme {
@@ -37,7 +40,52 @@ fun App() {
 fun AppNavHost(
     navController: StableNavController
 ) {
+    val policyManager: PolicyManager = koinInject()
+    
+    // Check policy status on app start
+    LaunchedEffect(Unit) {
+        policyManager.checkPolicyStatus()
+        val isPolicyAccepted = policyManager.isPolicyAccepted()
+        if (isPolicyAccepted) {
+            navController.navigate(Screen.Login)
+        } else {
+            navController.navigate(Screen.PrivacyPolicy)
+        }
+    }
+    
     when (navController.currentScreen) {
+        Screen.PrivacyPolicy -> {
+            SharedPrivacyPolicyScreen(
+                policyManager = policyManager,
+                onAccept = {
+                    // Accept policy and navigate to login
+                    kotlinx.coroutines.MainScope().launch {
+                        policyManager.acceptPolicy()
+                        navController.navigate(Screen.Login)
+                    }
+                },
+                onDecline = {
+                    // User declined policy - should exit app
+                    // For now, just stay on policy screen
+                }
+            )
+        }
+        Screen.Login -> {
+            val authViewModel: SharedAuthViewModel = koinInject()
+            SharedLoginScreen(
+                viewModel = authViewModel,
+                onLoginSuccess = {
+                    navController.navigate(Screen.Home)
+                },
+                onSwitchToRegister = {
+                    navController.navigate(Screen.Register)
+                },
+                onForgotPassword = {
+                    navController.navigate(Screen.ForgotPassword)
+                }
+            )
+        }
+        
         Screen.Home -> {
             HomeScreen(
                 onNavigateToTest = {
@@ -56,12 +104,31 @@ fun AppNavHost(
             )
         }
         
-        Screen.Settings -> {
-            PlaceholderScreen("Paramètres")
+        Screen.Register -> {
+            val authViewModel: SharedAuthViewModel = koinInject()
+            SharedRegisterScreen(
+                viewModel = authViewModel,
+                onRegistrationSuccess = {
+                    // Registration success is handled by the dialog, then redirects to login
+                },
+                onSwitchToLogin = {
+                    navController.navigate(Screen.Login)
+                }
+            )
         }
         
-        Screen.Login -> {
-            PlaceholderScreen("Connexion")
+        Screen.ForgotPassword -> {
+            val authViewModel: SharedAuthViewModel = koinInject()
+            SharedForgotPasswordScreen(
+                viewModel = authViewModel,
+                onBack = {
+                    navController.navigate(Screen.Login)
+                }
+            )
+        }
+        
+        Screen.Settings -> {
+            PlaceholderScreen("Paramètres")
         }
     }
 }

@@ -10,11 +10,11 @@ import androidx.compose.runtime.setValue
  * Navigation stable pour KMP (compatible iOS + Android)
  */
 enum class Screen {
-    Home, Test, Settings, Login
+    PrivacyPolicy, Home, Test, Settings, Login, Register, ForgotPassword
 }
 
 class StableNavController {
-    var currentScreen by mutableStateOf(Screen.Home)
+    var currentScreen by mutableStateOf(Screen.PrivacyPolicy)
         private set
     
     private val backStack = mutableListOf<Screen>()

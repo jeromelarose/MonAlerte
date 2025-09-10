@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Authentication Labels -->
+    <string name="auth_label_email">Email</string>
+    <string name="auth_label_password">Password</string>
+    <string name="auth_label_confirm_password">Confirm password</string>
+    <string name="auth_logo_description_content">Application logo</string>
+
+    <!-- Authentication Titles -->
+    <string name="auth_title_login">Sign In</string>
+    <string name="auth_button_connect">Sign In</string>
+    <string name="auth_link_forgot_password">Forgot password?</string>
+    <string name="auth_link_no_account_register">No account? Sign Up</string>
+
+    <!-- Welcome messages -->
+    <string name="auth_welcome_title">Welcome to MonAlerte</string>
+    <string name="auth_welcome_subtitle">Your safety, our priority</string>
+    <string name="auth_welcome_description">Protect yourself and your loved ones with our automatic emergency alert system</string>
+    <string name="auth_welcome_back">Good to see you again!</string>
+    <string name="auth_welcome_join_us">Join us for your safety</string>
+    <string name="auth_welcome_forgot_password">Recover your access</string>
+    <string name="auth_button_get_started">Get Started</string>
+    <string name="auth_button_sign_in">Sign In</string>
+
+    <!-- Registration -->
+    <string name="auth_title_register">Sign Up</string>
+    <string name="auth_button_register">Sign Up</string>
+    <string name="auth_link_already_account_login">Already have an account? Sign In</string>
+
+    <!-- Password Reset -->
+    <string name="auth_title_reset_password">Reset Password</string>
+    <string name="auth_button_send">Send</string>
+    <string name="auth_button_return">Back</string>
+
+    <!-- Account -->
+    <string name="auth_my_account">My Account</string>
+    <string name="auth_account_information">Account information</string>
+    <string name="auth_email">Email:</string>
+    <string name="auth_change_password">Change password</string>
+    <string name="auth_button_disconnected">Sign Out</string>
+    <string name="auth_new_password">New password</string>
+    <string name="auth_confirm_new_password">Confirm new password</string>
+    <string name="auth_confirm">Confirm</string>
+
+    <!-- Validation Errors -->
+    <string name="auth_error_email_empty">Email cannot be empty</string>
+    <string name="auth_error_email_invalid_format">Invalid email format</string>
+    <string name="auth_error_password_empty">Password cannot be empty</string>
+    <string name="auth_error_password_short">Password must contain at least 6 characters</string>
+    <string name="auth_error_password_short_hint">At least 6 characters.</string>
+    <string name="auth_error_confirm_password_empty">Please confirm your password</string>
+    <string name="auth_error_passwords_do_not_match">Passwords do not match</string>
+
+    <!-- API Messages -->
+    <string name="auth_api_info_verification_email_sent">A verification email has been sent to your address. Please check your inbox and click the link to activate your account.</string>
+    <string name="auth_api_forgot_password_success">📧 If this email address is registered, you will soon receive a link to reset your password.</string>
+
+    <!-- API Errors -->
+    <string name="auth_api_error_invalid_credentials">Invalid credentials.</string>
+    <string name="auth_api_error_email_already_exist">This email address is already in use. Please sign in or use a different address.</string>
+    <string name="auth_api_error_email_not_verified">Your email address has not been verified yet. Please check the email we sent you or sign up again if needed.</string>
+    <string name="auth_api_error_email_not_found">❌ Email address not found. Please check the entered address.</string>
+    <string name="auth_api_error_registration_failed">Registration failed. Please try again.</string>
+    <string name="auth_api_error_missing_token">Your session has expired or is invalid. Please sign in again.</string>
+    <string name="auth_api_error_server_generic">A server error occurred. Please try again later.</string>
+    <string name="auth_api_error_network">Network connection unavailable. Please check your connection and try again.</string>
+    <string name="auth_api_error_malformed_json">The sent request was malformed.</string>
+    <string name="auth_api_error_route_not_found">The requested service is not available at the moment.</string>
+    <string name="auth_api_error_unknown">An unexpected error occurred. Please try again.</string>
+
+    <!-- Content Descriptions -->
+    <string name="auth_content_desc_hide_password">Hide password</string>
+    <string name="auth_content_desc_show_password">Show password</string>
+    
+    <!-- Misc -->
+    <string name="auth_request_sent">Request sent</string>
+    <string name="auth_information">Information</string>
+    <string name="auth_ok">OK</string>
+    <string name="auth_sent">sent</string>
+    <string name="auth_exist">exists</string>
+
+    <!-- No Internet Screen -->
+    <string name="no_internet_icon_desc">No connection</string>
+    <string name="no_internet_title">Internet Connection Required</string>
+    <string name="no_internet_message">To use MonAlerte, you must be connected to the Internet to access the privacy policies and create your account.</string>
+    <string name="no_internet_check_connection_title">Check your connection</string>
+    <string name="no_internet_check_connection_details">• Turn on Wi-Fi or mobile data\n• Check that your signal is stable\n• Try getting closer to your router</string>
+    <string name="no_internet_settings_button">Settings</string>
+    <string name="no_internet_retry_button">Retry</string>
+    <string name="no_internet_auto_check">This check happens automatically as soon as you get a stable connection.</string>
+    
+    <!-- Registration success dialog -->
+    <string name="registration_success_dialog_title">Registration successful</string>
+    <string name="registration_success_dialog_message">A verification email has been sent to you. Please validate your account before signing in.</string>
+    <string name="registration_success_dialog_ok">Got it</string>
+    
+    <!-- Privacy Policy Prompt -->
+    <string name="privacy_policy_accept_and_continue">Accept and Continue</string>
+
+    <!-- Language Selection -->
+    <string name="language_selection_title">Choose Language</string>
+    <string name="language_french">Français</string>
+    <string name="language_english">English</string>
+    <string name="language_change_success">Language changed successfully</string>
+
+    <!-- Test screen -->
+    <string name="test_title">Test Screen</string>
+    <string name="test_button">Test Button</string>
+    <string name="test_toggle">Toggle Test</string>
+</resources>

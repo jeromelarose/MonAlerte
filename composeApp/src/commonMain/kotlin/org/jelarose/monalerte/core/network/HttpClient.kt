@@ -18,18 +18,22 @@ fun createHttpClient(): HttpClient {
                 prettyPrint = true
                 isLenient = true
                 ignoreUnknownKeys = true
+                coerceInputValues = true
+                encodeDefaults = true // Force inclusion of null fields to match server expectations
             })
         }
         
         // Configuration des logs
         install(Logging) {
             logger = Logger.SIMPLE
-            level = LogLevel.INFO
+            level = LogLevel.ALL // Match original Android app logging level
         }
         
-        // Configuration par défaut
+        // Configuration par défaut avec base URL
         install(DefaultRequest) {
-            // Headers par défaut si nécessaire
+            url("https://51.75.120.88.nip.io/")
+            headers.append("Accept", "application/json")
+            headers.append("Content-Type", "application/json")
         }
         
         // Timeout configuration

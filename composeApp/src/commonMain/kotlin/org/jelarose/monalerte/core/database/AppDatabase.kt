@@ -7,15 +7,18 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import org.jelarose.monalerte.core.database.dao.ToggleDao
 import org.jelarose.monalerte.core.database.entities.ToggleEntity
+import org.jelarose.monalerte.features.auth.data.database.AuthDao
+import org.jelarose.monalerte.features.auth.data.database.AuthTokenEntity
 
 @Database(
-    entities = [ToggleEntity::class],
-    version = 1,
+    entities = [ToggleEntity::class, AuthTokenEntity::class],
+    version = 2,
     exportSchema = true
 )
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun toggleDao(): ToggleDao
+    abstract fun authDao(): AuthDao
     
     companion object {
         const val DATABASE_NAME = "monalerte_database.db"

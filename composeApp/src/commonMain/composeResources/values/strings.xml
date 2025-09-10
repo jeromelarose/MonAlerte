@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Authentication Labels -->
+    <string name="auth_label_email">Email</string>
+    <string name="auth_label_password">Mot de passe</string>
+    <string name="auth_label_confirm_password">Confirmer le mot de passe</string>
+    <string name="auth_logo_description_content">Logo de l'application</string>
+
+    <!-- Authentication Titles -->
+    <string name="auth_title_login">Connexion</string>
+    <string name="auth_button_connect">Se connecter</string>
+    <string name="auth_link_forgot_password">Mot de passe oublié ?</string>
+    <string name="auth_link_no_account_register">Pas de compte ? S'enregistrer</string>
+
+    <!-- Welcome messages -->
+    <string name="auth_welcome_title">Bienvenue sur MonAlerte</string>
+    <string name="auth_welcome_subtitle">Votre sécurité, notre priorité</string>
+    <string name="auth_welcome_description">Protégez-vous et vos proches avec notre système d'alerte automatique en cas d'urgence</string>
+    <string name="auth_welcome_back">Content de vous revoir !</string>
+    <string name="auth_welcome_join_us">Rejoignez-nous pour votre sécurité</string>
+    <string name="auth_welcome_forgot_password">Récupérez votre accès</string>
+    <string name="auth_button_get_started">Commencer</string>
+    <string name="auth_button_sign_in">Se connecter</string>
+
+    <!-- Registration -->
+    <string name="auth_title_register">Inscription</string>
+    <string name="auth_button_register">S'enregistrer</string>
+    <string name="auth_link_already_account_login">Déjà un compte ? Se connecter</string>
+
+    <!-- Password Reset -->
+    <string name="auth_title_reset_password">Réinitialiser le mot de passe</string>
+    <string name="auth_button_send">Envoyer</string>
+    <string name="auth_button_return">Retour</string>
+
+    <!-- Account -->
+    <string name="auth_my_account">Mon Compte</string>
+    <string name="auth_account_information">Informations du compte</string>
+    <string name="auth_email">Email:</string>
+    <string name="auth_change_password">Changer le mot de passe</string>
+    <string name="auth_button_disconnected">Se déconnecter</string>
+    <string name="auth_new_password">Nouveau mot de passe</string>
+    <string name="auth_confirm_new_password">Confirmer le nouveau mot de passe</string>
+    <string name="auth_confirm">Confirmer</string>
+
+    <!-- Validation Errors -->
+    <string name="auth_error_email_empty">L'email ne peut pas être vide</string>
+    <string name="auth_error_email_invalid_format">Format d'email invalide</string>
+    <string name="auth_error_password_empty">Le mot de passe ne peut pas être vide</string>
+    <string name="auth_error_password_short">Le mot de passe doit contenir au moins 6 caractères</string>
+    <string name="auth_error_password_short_hint">Au moins 6 caractères.</string>
+    <string name="auth_error_confirm_password_empty">Veuillez confirmer votre mot de passe</string>
+    <string name="auth_error_passwords_do_not_match">Les mots de passe ne correspondent pas</string>
+
+    <!-- API Messages -->
+    <string name="auth_api_info_verification_email_sent">Un e-mail de vérification a été envoyé à votre adresse. Veuillez consulter votre boîte de réception et cliquer sur le lien pour activer votre compte.</string>
+    <string name="auth_api_forgot_password_success">📧 Si cette adresse e-mail est enregistrée, vous recevrez bientôt un lien pour réinitialiser votre mot de passe.</string>
+
+    <!-- API Errors -->
+    <string name="auth_api_error_invalid_credentials">Identifiants incorrects.</string>
+    <string name="auth_api_error_email_already_exist">Cette adresse e-mail est déjà utilisée. Veuillez vous connecter ou utiliser une autre adresse.</string>
+    <string name="auth_api_error_email_not_verified">Votre adresse e-mail n'a pas encore été vérifiée. Veuillez consulter l'e-mail que nous vous avons envoyé ou inscrivez-vous à nouveau si besoin.</string>
+    <string name="auth_api_error_email_not_found">❌ Adresse e-mail non trouvée. Veuillez vérifier l'adresse saisie.</string>
+    <string name="auth_api_error_registration_failed">L'inscription a échoué. Veuillez réessayer.</string>
+    <string name="auth_api_error_missing_token">Votre session a expiré ou est invalide. Veuillez vous reconnecter.</string>
+    <string name="auth_api_error_server_generic">Une erreur serveur s'est produite. Veuillez réessayer plus tard.</string>
+    <string name="auth_api_error_network">Connexion réseau indisponible. Veuillez vérifier votre connexion et réessayer.</string>
+    <string name="auth_api_error_malformed_json">La requête envoyée était malformée.</string>
+    <string name="auth_api_error_route_not_found">Le service demandé n'est pas disponible pour le moment.</string>
+    <string name="auth_api_error_unknown">Une erreur inattendue s'est produite. Veuillez réessayer.</string>
+
+    <!-- Content Descriptions -->
+    <string name="auth_content_desc_hide_password">Cacher mot de passe</string>
+    <string name="auth_content_desc_show_password">Afficher mot de passe</string>
+    
+    <!-- Misc -->
+    <string name="auth_request_sent">Demande envoyée</string>
+    <string name="auth_information">Information</string>
+    <string name="auth_ok">OK</string>
+    <string name="auth_sent">envoyé</string>
+    <string name="auth_exist">existe</string>
+
+    <!-- No Internet Screen -->
+    <string name="no_internet_icon_desc">Pas de connexion</string>
+    <string name="no_internet_title">Connexion Internet requise</string>
+    <string name="no_internet_message">Pour utiliser MonAlerte, vous devez être connecté à Internet afin d'accéder aux politiques de confidentialité et créer votre compte.</string>
+    <string name="no_internet_check_connection_title">Vérifiez votre connexion</string>
+    <string name="no_internet_check_connection_details">• Activez le Wi-Fi ou les données mobiles\n• Vérifiez que votre signal est stable\n• Essayez de vous rapprocher de votre routeur</string>
+    <string name="no_internet_settings_button">Paramètres</string>
+    <string name="no_internet_retry_button">Réessayer</string>
+    <string name="no_internet_auto_check">Cette vérification s'effectue automatiquement dès que vous retrouvez une connexion stable.</string>
+    
+    <!-- Registration success dialog -->
+    <string name="registration_success_dialog_title">Inscription réussie</string>
+    <string name="registration_success_dialog_message">Un email de vérification vous a été envoyé. Veuillez valider votre compte avant de vous connecter.</string>
+    <string name="registration_success_dialog_ok">Compris</string>
+    
+    <!-- Privacy Policy Prompt -->
+    <string name="privacy_policy_accept_and_continue">Accepter et Continuer</string>
+
+    <!-- Language Selection -->
+    <string name="language_selection_title">Choisir la langue</string>
+    <string name="language_french">Français</string>
+    <string name="language_english">English</string>
+    <string name="language_change_success">Langue modifiée avec succès</string>
+
+    <!-- Test screen -->
+    <string name="test_title">Test Screen</string>
+    <string name="test_button">Test Button</string>
+    <string name="test_toggle">Toggle Test</string>
+</resources>

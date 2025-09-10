@@ -228,6 +228,7 @@ object InterfaceMenuVoyagerScreen : Screen {
             },
             onVeille2Click = { 
                 // Navigation vers nouveau mode veille
+                println("🚀 InterfaceMenu: Navigating to WatchModeVoyagerScreen")
                 navigator.push(WatchModeVoyagerScreen)
             },
             onAddressSelectionClick = { 
@@ -345,13 +346,16 @@ object AccountVoyagerScreen : Screen {
 object WatchModeVoyagerScreen : Screen {
     @Composable
     override fun Content() {
+        println("🚀 WatchModeVoyagerScreen: Content() called")
         val navigator = LocalNavigator.currentOrThrow
         
         WatchModeScreen(
             onBackClick = { 
+                println("🚀 WatchModeVoyagerScreen: Back clicked")
                 navigator.pop()
             },
             onSettingsClick = { 
+                println("🚀 WatchModeVoyagerScreen: Settings clicked")
                 navigator.push(SettingsScreen)
             }
         )

@@ -172,6 +172,18 @@ object LocalizedStrings {
             "location_history_description" -> "Consultation de l'historique des positions"
             "view_location_history" -> "Voir l'historique"
             
+            // SMS Configuration
+            "sms_configuration_custom" -> "Modèle personnalisé configuré"
+            "sms_configuration_default" -> "Utilise le modèle par défaut"
+            "sms_template_editor_title" -> "Modèle SMS d'Alerte"
+            "sms_template_editor_description" -> "Personnalisez le message envoyé à vos contacts d'urgence"
+            "sms_template_label" -> "Modèle SMS"
+            "sms_template_placeholder" -> "🚨 ALERTE URGENCE! Je suis en situation critique. Ma position: {POSITION}. Suivez-moi en temps réel: {LIEN}"
+            "sms_template_hint" -> "Utilisez {POSITION} pour la localisation et {LIEN} pour le suivi"
+            "edit_button" -> "Modifier"
+            "save_button" -> "Enregistrer"
+            "cancel_button" -> "Annuler"
+            
             else -> key // Fallback to key if not found
         }
     }
@@ -332,6 +344,18 @@ object LocalizedStrings {
             "location_history_title" -> "Location History"
             "location_history_description" -> "View position history"
             "view_location_history" -> "View history"
+            
+            // SMS Configuration
+            "sms_configuration_custom" -> "Custom template configured"
+            "sms_configuration_default" -> "Using default template"
+            "sms_template_editor_title" -> "Alert SMS Template"
+            "sms_template_editor_description" -> "Customize the message sent to your emergency contacts"
+            "sms_template_label" -> "SMS Template"
+            "sms_template_placeholder" -> "🚨 EMERGENCY ALERT! I'm in a critical situation. My position: {POSITION}. Track me live: {LINK}"
+            "sms_template_hint" -> "Use {POSITION} for location and {LINK} for tracking"
+            "edit_button" -> "Edit"
+            "save_button" -> "Save"
+            "cancel_button" -> "Cancel"
             
             else -> key // Fallback to key if not found
         }

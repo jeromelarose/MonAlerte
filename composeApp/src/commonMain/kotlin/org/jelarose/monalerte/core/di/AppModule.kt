@@ -9,6 +9,8 @@ import org.jelarose.monalerte.core.network.ApiService
 import org.jelarose.monalerte.core.network.createHttpClient
 import org.jelarose.monalerte.core.utils.SharedDataStore
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
+import org.jelarose.monalerte.features.home.presentation.viewmodels.WatchModeViewModel
+import org.jelarose.monalerte.features.home.domain.MediaPermissionManager
 import org.jelarose.monalerte.features.auth.data.api.AuthApiService
 import org.jelarose.monalerte.features.auth.data.repository.AuthRepositoryImpl
 import org.jelarose.monalerte.features.auth.domain.repository.AuthRepository
@@ -95,4 +97,7 @@ val appModule = module {
     factory { AuthViewModel(get(), get(), get(), get()) }
     factory { SharedAuthViewModel(get(), get(), get(), get(), get()) }
     factory { AccountViewModel(get<AuthRepositoryImpl>(), get()) }
+    
+    // WatchModeViewModel - Singleton pour éviter les boucles de recomposition
+    single { WatchModeViewModel(get(), get()) }
 }

@@ -6,12 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.LocationOn
+// Utilisation d'emojis pour une compatibilité cross-platform parfaite (iOS/Android)
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,7 +21,17 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jelarose.monalerte.core.utils.localizedString
+import org.jelarose.monalerte.core.di.koinInject
+import org.jelarose.monalerte.features.home.presentation.viewmodels.WatchModeViewModel
+import org.jelarose.monalerte.features.home.presentation.viewmodels.WatchModeSecurityOption
+import org.jelarose.monalerte.features.home.presentation.viewmodels.WatchModeUiEvent
+import org.jelarose.monalerte.features.home.presentation.components.MediaPermissionDialog
+import org.jelarose.monalerte.features.home.presentation.components.AudioRequiredDialog
+import org.jelarose.monalerte.features.home.presentation.components.ErrorSnackbar
+import dev.icerock.moko.permissions.PermissionsController
+import dev.icerock.moko.permissions.compose.BindEffect
 
 /**
  * Écran du mode veille - Reproduction exacte de WatchMode2Activity.kt
@@ -38,7 +43,45 @@ fun WatchModeScreen(
     onBackClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
+    println("🔧 WatchModeScreen: Composing WatchModeScreen")
+    
+    val watchModeViewModel: WatchModeViewModel = koinInject()
+    val permissionsController: PermissionsController = koinInject()
+    println("🔧 WatchModeScreen: ViewModel injected successfully")
+    
+    // Bind MOKO Permissions to current Activity
+    BindEffect(permissionsController)
+    
+    val uiState by watchModeViewModel.uiState.collectAsStateWithLifecycle()
+    val uiEvent by watchModeViewModel.uiEvents.collectAsStateWithLifecycle()
+    println("🔧 WatchModeScreen: UI State: $uiState")
     val scrollState = rememberScrollState()
+    
+    // State pour les dialogues
+    var showPermissionDialog by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var showAudioRequiredDialog by remember { mutableStateOf(false) }
+    var showErrorMessage by remember { mutableStateOf<String?>(null) }
+    
+    // Gérer les événements UI (permissions, erreurs)
+    LaunchedEffect(uiEvent) {
+        uiEvent?.let { event ->
+            when (event) {
+                is WatchModeUiEvent.ShowPermissionDialog -> {
+                    println("🔐 WatchModeScreen: Permission dialog requested: ${event.permission}")
+                    showPermissionDialog = event.permission to event.reason
+                }
+                is WatchModeUiEvent.ShowErrorMessage -> {
+                    println("❌ WatchModeScreen: Error message: ${event.message}")
+                    showErrorMessage = event.message
+                }
+                WatchModeUiEvent.AudioRequiredForVideo -> {
+                    println("⚠️ WatchModeScreen: Audio required for video activation")
+                    showAudioRequiredDialog = true
+                }
+            }
+            watchModeViewModel.clearUiEvent()
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -51,9 +94,10 @@ fun WatchModeScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = localizedString("back_button_desc")
+                        Text(
+                            text = "←",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 },
@@ -97,7 +141,7 @@ fun WatchModeScreen(
 
                 // Accident Detection Feature
                 FeatureCard(
-                    icon = Icons.Filled.Warning,
+                    emoji = "⚠️",
                     title = localizedString("accident_detection_title_v2"),
                     description = localizedString("accident_detection_description_v2"),
                     isEnabled = false, // TODO: Connect to ViewModel state
@@ -108,15 +152,7 @@ fun WatchModeScreen(
 
                 // Shake Detection Feature
                 FeatureCard(
-                    icon = null,
-                    customIcon = {
-                        // TODO: Use shake drawable icon from resources
-                        Text(
-                            text = "📳",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                    },
+                    emoji = "📳",
                     title = localizedString("shake_detection_title_v2"),
                     description = localizedString("shake_detection_description_v2"),
                     isEnabled = false, // TODO: Connect to ViewModel state
@@ -156,38 +192,43 @@ fun WatchModeScreen(
 
                 // Audio Recording Feature
                 FeatureCard(
-                    icon = null,
-                    customIcon = {
-                        Text(
-                            text = "🎤",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    },
+                    emoji = "🎤",
                     title = localizedString("audio_recording_title_v2"),
                     description = localizedString("audio_recording_description_v2"),
-                    isEnabled = false, // TODO: Connect to ViewModel state
-                    onToggle = { /* TODO: viewModel.onSecurityOptionChanged(SecurityOption.MANUAL_AUDIO, !isEnabled) */ },
+                    isEnabled = uiState.isAudioRecordingEnabled,
+                    onToggle = { 
+                        println("🔊 WatchModeScreen: Audio toggle clicked")
+                        watchModeViewModel.onSecurityOptionChanged(WatchModeSecurityOption.AUDIO_RECORDING, !uiState.isAudioRecordingEnabled)
+                    },
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
                     iconTint = MaterialTheme.colorScheme.primary
                 )
 
-                // Video Recording Feature
+                // Video Recording Feature avec gestion des dépendances
                 FeatureCard(
-                    icon = null,
-                    customIcon = {
-                        Text(
-                            text = "📹",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    },
+                    emoji = "📹",
                     title = localizedString("video_recording_title_v2"),
-                    description = localizedString("video_recording_description_v2"),
-                    isEnabled = false, // TODO: Connect to ViewModel state
-                    onToggle = { /* TODO: viewModel.onSecurityOptionChanged(SecurityOption.MANUAL_VIDEO, !isEnabled) */ },
-                    backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
-                    iconTint = MaterialTheme.colorScheme.secondary
+                    description = if (!uiState.isVideoToggleEnabled) {
+                        "L'audio doit être activé d'abord" // Message dynamique
+                    } else {
+                        localizedString("video_recording_description_v2")
+                    },
+                    isEnabled = uiState.isVideoRecordingEnabled,
+                    isInteractable = uiState.isVideoToggleEnabled, // Nouveau paramètre pour contrôler l'interaction
+                    onToggle = { 
+                        println("📹 WatchModeScreen: Video toggle clicked")
+                        watchModeViewModel.onSecurityOptionChanged(WatchModeSecurityOption.VIDEO_RECORDING, !uiState.isVideoRecordingEnabled)
+                    },
+                    backgroundColor = if (uiState.isVideoToggleEnabled) {
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f) // Apparence désactivée
+                    },
+                    iconTint = if (uiState.isVideoToggleEnabled) {
+                        MaterialTheme.colorScheme.secondary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f) // Grisé
+                    }
                 )
 
                 // Emergency Contacts Section
@@ -212,13 +253,57 @@ fun WatchModeScreen(
                 )
 
                 SmsConfigCard(
-                    // TODO: Connect to settings
+                    smsTemplate = uiState.smsTemplate,
+                    onSmsTemplateChanged = { template -> 
+                        println("💬 WatchModeScreen: SMS template changed")
+                        watchModeViewModel.onSmsTemplateChanged(template) 
+                    }
                 )
 
                 // Bottom spacing
                 Spacer(modifier = Modifier.height(80.dp))
             }
         }
+    }
+    
+    // Dialogues de permission et d'erreur
+    showPermissionDialog?.let { (permission, reason) ->
+        MediaPermissionDialog(
+            permission = permission,
+            reason = reason,
+            onConfirm = {
+                println("🔐 WatchModeScreen: Permission dialog confirmed for: $permission")
+                // Déclencher la VRAIE demande de permission système via MOKO
+                watchModeViewModel.requestPermission(permission)
+                showPermissionDialog = null
+            },
+            onDismiss = {
+                println("🔐 WatchModeScreen: Permission dialog dismissed for: $permission")
+                showPermissionDialog = null
+            }
+        )
+    }
+    
+    if (showAudioRequiredDialog) {
+        AudioRequiredDialog(
+            onConfirm = {
+                println("⚠️ WatchModeScreen: Audio required dialog confirmed")
+                showAudioRequiredDialog = false
+            },
+            onDismiss = {
+                println("⚠️ WatchModeScreen: Audio required dialog dismissed")
+                showAudioRequiredDialog = false
+            }
+        )
+    }
+    
+    showErrorMessage?.let { message ->
+        ErrorSnackbar(
+            message = message,
+            onDismiss = {
+                showErrorMessage = null
+            }
+        )
     }
 }
 
@@ -259,11 +344,12 @@ private fun ConfigurationCard() {
 
 @Composable
 private fun FeatureCard(
-    icon: ImageVector?,
+    emoji: String? = null,
     customIcon: @Composable (() -> Unit)? = null,
     title: String,
     description: String,
     isEnabled: Boolean,
+    isInteractable: Boolean = true, // Nouveau paramètre pour contrôler l'interaction
     onToggle: () -> Unit,
     backgroundColor: Color,
     iconTint: Color
@@ -296,12 +382,11 @@ private fun FeatureCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                if (icon != null) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = if (isEnabled) iconTint else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                if (emoji != null) {
+                    Text(
+                        text = emoji,
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = if (isEnabled) iconTint else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                     )
                 } else {
                     customIcon?.invoke()
@@ -334,10 +419,15 @@ private fun FeatureCard(
 
             Switch(
                 checked = isEnabled,
-                onCheckedChange = { onToggle() },
+                enabled = isInteractable, // Contrôle si le switch est cliquable
+                onCheckedChange = { if (isInteractable) onToggle() }, // Seulement si interactable
                 modifier = Modifier.semantics {
                     testTag = "feature_switch_${title.lowercase().replace(" ", "_")}"
-                    contentDescription = "Activer/Désactiver $title"
+                    contentDescription = if (isInteractable) {
+                        "Activer/Désactiver $title"
+                    } else {
+                        "$title - Nécessite l'activation de l'audio d'abord"
+                    }
                 }
             )
         }
@@ -709,7 +799,12 @@ private fun ContactsCard(
 }
 
 @Composable
-private fun SmsConfigCard() {
+private fun SmsConfigCard(
+    smsTemplate: String,
+    onSmsTemplateChanged: (String) -> Unit
+) {
+    var showSmsEditor by remember { mutableStateOf(false) }
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -722,56 +817,160 @@ private fun SmsConfigCard() {
             containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.2f)
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { /* TODO: Navigate to SMS configuration */ }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
-                    ),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "💬",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.tertiary
-                )
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "💬",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = localizedString("sms_configuration_title"),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = if (smsTemplate.isNotEmpty()) 
+                            localizedString("sms_configuration_custom")
+                        else 
+                            localizedString("sms_configuration_default"),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 20.sp
+                    )
+                }
+
+                TextButton(
+                    onClick = { showSmsEditor = true },
+                    modifier = Modifier.semantics {
+                        testTag = "sms_config_edit_button"
+                        contentDescription = "Modifier le modèle SMS"
+                    }
+                ) {
+                    Text(
+                        text = localizedString("edit_button"),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = localizedString("sms_configuration_title"),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = localizedString("sms_configuration_description"),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 20.sp
-                )
+            
+            // Show current template preview if exists
+            if (smsTemplate.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Text(
+                        text = smsTemplate,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(12.dp),
+                        maxLines = 3
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = "→",
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
+    
+    // SMS Editor Dialog
+    if (showSmsEditor) {
+        SmsTemplateEditorDialog(
+            currentTemplate = smsTemplate,
+            onTemplateChanged = onSmsTemplateChanged,
+            onDismiss = { showSmsEditor = false }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SmsTemplateEditorDialog(
+    currentTemplate: String,
+    onTemplateChanged: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var editedTemplate by remember { mutableStateOf(currentTemplate) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = localizedString("sms_template_editor_title"),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = localizedString("sms_template_editor_description"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                OutlinedTextField(
+                    value = editedTemplate,
+                    onValueChange = { editedTemplate = it },
+                    label = { Text(localizedString("sms_template_label")) },
+                    placeholder = { Text(localizedString("sms_template_placeholder")) },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    maxLines = 6
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = localizedString("sms_template_hint"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    println("💬 WatchModeScreen: SMS template updated")
+                    onTemplateChanged(editedTemplate)
+                    onDismiss()
+                }
+            ) {
+                Text(localizedString("save_button"))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(localizedString("cancel_button"))
+            }
+        }
+    )
 }

@@ -17,6 +17,11 @@ class SharedDataStore(private val dataStore: DataStore<Preferences>) {
     
     companion object {
         val TOGGLE_KEY = booleanPreferencesKey("test_toggle")
+        
+        // Watch Mode Settings Keys
+        val WATCH_MODE_AUDIO_KEY = booleanPreferencesKey("watch_mode_audio_enabled")
+        val WATCH_MODE_VIDEO_KEY = booleanPreferencesKey("watch_mode_video_enabled")
+        val WATCH_MODE_SMS_TEMPLATE_KEY = stringPreferencesKey("watch_mode_sms_template")
     }
     
     val toggleState: Flow<Boolean> = dataStore.data
@@ -27,6 +32,45 @@ class SharedDataStore(private val dataStore: DataStore<Preferences>) {
     suspend fun setToggleState(enabled: Boolean) {
         dataStore.edit { preferences ->
             preferences[TOGGLE_KEY] = enabled
+        }
+    }
+    
+    // Watch Mode Audio Recording
+    val watchModeAudioEnabled: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[WATCH_MODE_AUDIO_KEY] ?: false
+        }
+    
+    suspend fun setWatchModeAudioEnabled(enabled: Boolean) {
+        logger.d { "Setting watch mode audio enabled: $enabled" }
+        dataStore.edit { preferences ->
+            preferences[WATCH_MODE_AUDIO_KEY] = enabled
+        }
+    }
+    
+    // Watch Mode Video Recording
+    val watchModeVideoEnabled: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[WATCH_MODE_VIDEO_KEY] ?: false
+        }
+    
+    suspend fun setWatchModeVideoEnabled(enabled: Boolean) {
+        logger.d { "Setting watch mode video enabled: $enabled" }
+        dataStore.edit { preferences ->
+            preferences[WATCH_MODE_VIDEO_KEY] = enabled
+        }
+    }
+    
+    // Watch Mode SMS Template
+    val watchModeSmsTemplate: Flow<String> = dataStore.data
+        .map { preferences ->
+            preferences[WATCH_MODE_SMS_TEMPLATE_KEY] ?: ""
+        }
+    
+    suspend fun setWatchModeSmsTemplate(template: String) {
+        logger.d { "Setting watch mode SMS template: ${template.take(50)}..." }
+        dataStore.edit { preferences ->
+            preferences[WATCH_MODE_SMS_TEMPLATE_KEY] = template
         }
     }
     

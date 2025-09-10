@@ -59,6 +59,8 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.screenmodel)
             implementation(libs.voyager.transitions)
+            implementation(libs.moko.permissions)
+            implementation(libs.moko.permissions.compose)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

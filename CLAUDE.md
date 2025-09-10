@@ -55,11 +55,28 @@ This is a Kotlin Multiplatform (KMP) project targeting Android and iOS, using Co
 
 ## Architecture
 
-The app follows Kotlin Multiplatform architecture patterns:
+The app follows a clean, feature-based architecture with Kotlin Multiplatform patterns:
 
-- **Shared Business Logic**: All core logic resides in `commonMain` using Kotlin Multiplatform
+### Code Organization
+- **Feature-based modules**: Each feature has `data/`, `domain/`, and `presentation/` layers
+- **Core infrastructure**: Located in `core/` with cross-cutting concerns
+- **Shared Business Logic**: All core logic resides in `commonMain`
 - **UI Layer**: Compose Multiplatform provides shared UI components across Android and iOS
 - **Platform-Specific Code**: Platform implementations use expect/actual mechanism for platform-specific APIs
+
+### Key Technical Stack
+- **Navigation**: Voyager Navigator (preferred) with StableNavigation as legacy fallback
+- **Dependency Injection**: Koin (configured in `core/di/AppModule.kt`)
+- **Database**: Room KMP with KSP compilation for cross-platform support
+- **Storage**: Three-tier system (SecureStorage/KVault → Room → DataStore)
+- **Networking**: Ktor HttpClient with kotlinx.serialization
+- **Validation**: Konform for declarative input validation
+- **Testing**: Kotest with Turbine for Flow testing
+
+### Important Architecture Details
+- **Navigation Migration**: Project uses Voyager as primary navigation (controlled by `NavigationFeatureFlag.USE_VOYAGER`)
+- **Smart Caching**: Multi-level authentication cache with graceful fallback
+- **Bilingual Support**: Complete localization system with dynamic language switching
 - **Dependencies**: Managed via Gradle Version Catalog (`gradle/libs.versions.toml`)
 
 Key technical details:
@@ -68,3 +85,38 @@ Key technical details:
 - Android compile SDK: 36
 - Android min SDK: 24
 - JVM target: 11
+
+## Development Workflow
+
+### Key Files for Understanding the Codebase
+- `core/di/AppModule.kt` - Dependency injection configuration
+- `core/navigation/VoyagerScreens.kt` - Navigation setup and screen definitions
+- `gradle/libs.versions.toml` - Complete dependency catalog
+- `PROJECT_SUMMARY.md` - Detailed migration history and architecture overview
+
+### Testing
+```shell
+# Run specific test class (Kotest)
+./gradlew test --tests "*NavigationTest*"
+
+# Run all common tests
+./gradlew :composeApp:commonMainTest
+
+# Run platform-specific tests
+./gradlew :composeApp:androidUnitTest
+./gradlew :composeApp:iosSimulatorArm64Test
+```
+
+### Working with Features
+When adding new features:
+1. Follow the feature-based structure: `features/[feature-name]/data|domain|presentation/`
+2. Register ViewModels in `AppModule.kt` using appropriate scope (factory vs singleton)
+3. Add screen definitions to `VoyagerScreens.kt` for navigation
+4. Use Konform validators for input validation (see `AuthValidators.kt`)
+5. Follow the three-tier storage pattern for data persistence
+
+### Navigation System
+- **Current**: Voyager Navigator is the primary navigation system
+- **Legacy**: StableNavigation exists as deprecated fallback
+- **Control**: Navigation system controlled by `NavigationFeatureFlag.USE_VOYAGER`
+- **Screens**: All screens defined in `VoyagerScreens.kt` with fade transitions

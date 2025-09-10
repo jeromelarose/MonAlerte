@@ -60,6 +60,9 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotest.framework)
+            implementation(libs.kotest.assertions)
+            implementation(libs.turbine)
         }
     }
 }

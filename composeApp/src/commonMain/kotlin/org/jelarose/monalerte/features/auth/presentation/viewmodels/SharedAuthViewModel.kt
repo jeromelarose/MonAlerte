@@ -443,19 +443,23 @@ class SharedAuthViewModel(
     fun checkExistingAuthentication(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
-                logger.d("Checking existing authentication...")
+                logger.d("🔍 Checking existing authentication...")
                 
                 // Check if we have a valid token stored
                 val storedToken = authRepository.getAuthToken()
                 val storedEmail = authRepository.getUserEmail()
                 
+                logger.d("🔍 Stored token: ${if (storedToken.isNullOrEmpty()) "EMPTY" else "EXISTS (${storedToken.take(20)}...)"}")
+                logger.d("🔍 Stored email: ${storedEmail ?: "EMPTY"}")
+                
                 if (!storedToken.isNullOrEmpty() && !storedEmail.isNullOrEmpty()) {
-                    logger.i("Found stored authentication for: $storedEmail")
+                    logger.i("🟢 Found stored authentication for: $storedEmail")
+                    logger.d("🔍 Verifying token with server...")
                     
                     // Verify the token is still valid with the server
                     authRepository.verifyToken(null)
                         .onSuccess {
-                            logger.i("Stored token is valid, user is authenticated")
+                            logger.i("✅ Stored token is valid, user is authenticated")
                             _jwtToken.value = storedToken
                             _email.value = storedEmail
                             _authState.value = AuthState.Success(
@@ -465,17 +469,17 @@ class SharedAuthViewModel(
                             onResult(true)
                         }
                         .onFailure { error ->
-                            logger.w("Stored token is invalid: ${error.message}")
+                            logger.w("❌ Stored token is invalid: ${error.message}")
                             // Clear invalid token
                             authRepository.clearAuthToken()
                             onResult(false)
                         }
                 } else {
-                    logger.d("No stored authentication found")
+                    logger.d("🔴 No stored authentication found (token: ${storedToken != null}, email: ${storedEmail != null})")
                     onResult(false)
                 }
             } catch (e: Exception) {
-                logger.e("Error checking existing authentication: ${e.message}")
+                logger.e("❌ Error checking existing authentication: ${e.message}", e)
                 onResult(false)
             }
         }

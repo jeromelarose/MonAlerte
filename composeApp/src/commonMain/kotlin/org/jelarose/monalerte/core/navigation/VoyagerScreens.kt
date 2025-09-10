@@ -83,7 +83,9 @@ object StartupScreen : Screen {
                 // Politique acceptée, vérifier l'authentification avant d'aller au login
                 if (!authChecked) {
                     LaunchedEffect(Unit) {
+                        println("🚀 StartupScreen: Policy accepted, checking authentication...")
                         authViewModel.checkExistingAuthentication { authenticated ->
+                            println("🚀 StartupScreen: Authentication check result: $authenticated")
                             isAuthenticated = authenticated
                             authChecked = true
                         }
@@ -105,9 +107,12 @@ object StartupScreen : Screen {
                 } else {
                     // Une fois l'auth vérifiée, naviguer vers la bonne destination
                     LaunchedEffect(Unit) {
+                        println("🚀 StartupScreen: Auth checked, navigating...")
                         if (isAuthenticated) {
+                            println("🚀 StartupScreen: User authenticated, going to InterfaceMenu")
                             navigator.replace(InterfaceMenuVoyagerScreen)
                         } else {
+                            println("🚀 StartupScreen: User not authenticated, going to Login")
                             navigator.replace(LoginScreen)
                         }
                     }

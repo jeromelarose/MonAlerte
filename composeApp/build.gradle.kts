@@ -56,6 +56,9 @@ kotlin {
             implementation(libs.kermit)
             implementation(libs.konform)
             implementation(libs.kvault)
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.transitions)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

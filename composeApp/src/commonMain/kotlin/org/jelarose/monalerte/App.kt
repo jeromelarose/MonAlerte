@@ -13,6 +13,7 @@ import org.jelarose.monalerte.core.di.koinInject
 import org.jelarose.monalerte.core.navigation.Screen
 import org.jelarose.monalerte.core.navigation.StableNavController
 import org.jelarose.monalerte.core.navigation.rememberStableNavController
+import org.jelarose.monalerte.core.navigation.AppNavigationHost
 import org.jelarose.monalerte.core.theme.MonAlerteTheme
 import org.jelarose.monalerte.features.test.presentation.TestScreen
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
@@ -29,10 +30,9 @@ import kotlinx.coroutines.launch
 @Composable
 @Preview
 fun App() {
-    val navController = rememberStableNavController()
-    
     MonAlerteTheme {
-        AppNavHost(navController)
+        // Navigation hybride avec feature flag
+        AppNavigationHost()
     }
 }
 

@@ -456,8 +456,12 @@ class SharedAuthViewModel(
                     logger.i("🟢 Found stored authentication for: $storedEmail")
                     logger.d("🔍 Verifying token with server...")
                     
+                    // Get the accepted policy version to send with verification
+                    val acceptedPolicyVersion = authRepository.getPolicyVersion()
+                    logger.d("🔍 Using policy version: $acceptedPolicyVersion")
+                    
                     // Verify the token is still valid with the server
-                    authRepository.verifyToken(null)
+                    authRepository.verifyToken(acceptedPolicyVersion)
                         .onSuccess {
                             logger.i("✅ Stored token is valid, user is authenticated")
                             _jwtToken.value = storedToken

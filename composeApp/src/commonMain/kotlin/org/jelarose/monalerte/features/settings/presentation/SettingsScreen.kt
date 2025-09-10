@@ -17,8 +17,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import monalerte.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
+import org.jelarose.monalerte.core.utils.localizedString
 
 /**
  * Écran des paramètres - réplique exacte de SettingsMainScreen
@@ -46,7 +45,7 @@ fun SettingsScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        text = stringResource(Res.string.settings_title),
+                        text = localizedString("settings_title"),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -98,50 +97,50 @@ fun SettingsScreen(
             // Définir les items de settings dans le contexte @Composable
             val settingsItems = listOf(
                 SettingItem(
-                    title = stringResource(Res.string.settings_account_title),
-                    description = stringResource(Res.string.settings_account_description),
+                    title = localizedString("auth_my_account"),
+                    description = localizedString("settings_account_description"),
                     emoji = "👤",
                     testTag = "settings_account"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_emergency_contacts_title),
-                    description = stringResource(Res.string.settings_emergency_contacts_description),
+                    title = localizedString("settings_emergency_contacts"),
+                    description = localizedString("settings_emergency_contacts_description"),
                     emoji = "📞",
                     testTag = "settings_emergency_contacts"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_shortcuts_title),
-                    description = stringResource(Res.string.settings_shortcuts_description),
+                    title = localizedString("settings_shortcuts"),
+                    description = localizedString("settings_shortcuts_description"),
                     emoji = "⚡",
                     testTag = "settings_shortcuts"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_permissions_title),
-                    description = stringResource(Res.string.settings_permissions_description),
+                    title = localizedString("settings_permissions"),
+                    description = localizedString("settings_permissions_description"),
                     emoji = "🔐",
                     testTag = "settings_permissions"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_sms_alert_title),
-                    description = stringResource(Res.string.settings_sms_alert_description),
+                    title = localizedString("settings_sms_alert"),
+                    description = localizedString("settings_sms_alert_description"),
                     emoji = "💬",
                     testTag = "settings_sms_alert"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_widget_config_title),
-                    description = stringResource(Res.string.settings_widget_config_description),
+                    title = localizedString("settings_widget_config"),
+                    description = localizedString("settings_widget_config_description"),
                     emoji = "🧩",
                     testTag = "settings_widget_config"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_notifications_title),
-                    description = stringResource(Res.string.settings_notifications_description),
+                    title = localizedString("settings_notifications"),
+                    description = localizedString("settings_notifications_description"),
                     emoji = "🔔",
                     testTag = "settings_notifications"
                 ),
                 SettingItem(
-                    title = stringResource(Res.string.settings_privacy_policy_title),
-                    description = stringResource(Res.string.settings_privacy_policy_description),
+                    title = localizedString("settings_privacy_policy"),
+                    description = localizedString("settings_privacy_policy_description"),
                     emoji = "📋",
                     testTag = "settings_privacy_policy"
                 )

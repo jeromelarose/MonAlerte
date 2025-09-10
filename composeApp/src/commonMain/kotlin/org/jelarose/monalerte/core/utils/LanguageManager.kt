@@ -4,6 +4,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jelarose.monalerte.core.utils.SharedDataStore
 import co.touchlab.kermit.Logger
 
@@ -31,11 +34,22 @@ class LanguageManager(
     
     private fun loadSavedLanguage() {
         try {
-            // Note: This will be loaded asynchronously, for now use default
-            _currentLanguage.value = LANGUAGE_FRENCH
-            logger.d { "Initialized with default language: ${LANGUAGE_FRENCH}" }
+            // Load language asynchronously using coroutine
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val savedLanguage = sharedDataStore.getString(LANGUAGE_KEY) 
+                        ?: sharedDataStore.getString("app_language") // Fallback pour compatibilité
+                        ?: LANGUAGE_FRENCH
+                    
+                    _currentLanguage.value = savedLanguage
+                    logger.d { "Loaded saved language: $savedLanguage" }
+                } catch (e: Exception) {
+                    logger.w(e) { "Error loading saved language, using default" }
+                    _currentLanguage.value = LANGUAGE_FRENCH
+                }
+            }
         } catch (e: Exception) {
-            logger.e(e) { "Error loading language preference" }
+            logger.e(e) { "Error initializing language loading" }
             _currentLanguage.value = LANGUAGE_FRENCH
         }
     }
@@ -43,7 +57,9 @@ class LanguageManager(
     suspend fun setLanguage(languageCode: String) {
         try {
             logger.d { "Setting language to: $languageCode" }
+            // Save with both keys for compatibility
             sharedDataStore.putString(LANGUAGE_KEY, languageCode)
+            sharedDataStore.putString("app_language", languageCode) // Sync with AuthRepository
             _currentLanguage.value = languageCode
             logger.d { "Language preference saved successfully" }
         } catch (e: Exception) {

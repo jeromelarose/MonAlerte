@@ -20,8 +20,7 @@ import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import monalerte.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
+import org.jelarose.monalerte.core.utils.localizedString
 
 /**
  * Écran du menu des interfaces - réplique exacte de InterfaceMenuActivity
@@ -37,7 +36,7 @@ fun InterfaceMenuScreen(
     onLocationHistoryClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
-    val interfaceMenuContentDesc = stringResource(Res.string.interface_menu_content_desc)
+    val interfaceMenuContentDesc = localizedString("interface_menu_content_desc")
     
     Scaffold(
         modifier = Modifier.semantics {
@@ -48,7 +47,7 @@ fun InterfaceMenuScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        text = stringResource(Res.string.interface_menu_title),
+                        text = localizedString("interface_menu_title"),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -122,7 +121,7 @@ fun InterfaceMenuScreen(
                     )
                     
                     Text(
-                        text = stringResource(Res.string.interface_menu_description),
+                        text = localizedString("interface_menu_description"),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center,
@@ -138,8 +137,8 @@ fun InterfaceMenuScreen(
                 
                 // Ordre: 1. Veille (ex-Veille Plus), 2. Position/itinéraire, 3. Gérer les lieux, 4. Ancien Veille
                 ModernInterfaceCard(
-                    title = stringResource(Res.string.interface_menu_watch_mode_title),
-                    description = stringResource(Res.string.interface_menu_watch_mode_2_description),
+                    title = localizedString("interface_menu_watch_mode_title"),
+                    description = localizedString("interface_menu_watch_mode_2_description"),
                     emoji = "👁️",
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.error,
@@ -150,8 +149,8 @@ fun InterfaceMenuScreen(
                 )
                 
                 ModernInterfaceCard(
-                    title = stringResource(Res.string.interface_menu_position_tracking_title),
-                    description = stringResource(Res.string.interface_menu_position_tracking_description),
+                    title = localizedString("interface_menu_position_tracking_title"),
+                    description = localizedString("interface_menu_position_tracking_description"),
                     emoji = "🧭",
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.primary,
@@ -162,8 +161,8 @@ fun InterfaceMenuScreen(
                 )
                 
                 ModernInterfaceCard(
-                    title = stringResource(Res.string.interface_menu_address_selection_title),
-                    description = stringResource(Res.string.interface_menu_address_selection_description),
+                    title = localizedString("interface_menu_address_selection_title"),
+                    description = localizedString("interface_menu_address_selection_description"),
                     emoji = "🏠",
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.tertiary,
@@ -174,8 +173,8 @@ fun InterfaceMenuScreen(
                 )
                 
                 ModernInterfaceCard(
-                    title = stringResource(Res.string.interface_menu_location_history_title),
-                    description = stringResource(Res.string.interface_menu_location_history_description),
+                    title = localizedString("interface_menu_location_history_title"),
+                    description = localizedString("interface_menu_location_history_description"),
                     emoji = "📍",
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.surface.copy(red = 0.6f, green = 0.4f, blue = 0.9f),
@@ -186,8 +185,8 @@ fun InterfaceMenuScreen(
                 )
                 
                 ModernInterfaceCard(
-                    title = stringResource(Res.string.interface_menu_old_watch_mode_title),
-                    description = stringResource(Res.string.mode_standby_description),
+                    title = localizedString("interface_menu_old_watch_mode_title"),
+                    description = localizedString("mode_standby_description"),
                     emoji = "⚙️",
                     gradientColors = listOf(
                         MaterialTheme.colorScheme.secondary,

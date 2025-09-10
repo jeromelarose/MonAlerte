@@ -25,8 +25,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import monalerte.composeapp.generated.resources.*
-import org.jetbrains.compose.resources.stringResource
+import kotlinx.coroutines.launch
+import org.jelarose.monalerte.core.utils.localizedString
+import org.jelarose.monalerte.core.utils.LanguageManager
+import org.jelarose.monalerte.core.di.koinInject
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.AccountViewModel
 
 /**
@@ -68,7 +70,9 @@ fun AccountScreen(
     var showLanguageSelectionDialog by remember { mutableStateOf(false) }
     
     // Langue actuelle (simplifiée pour cet exemple)
-    var currentLanguage by remember { mutableStateOf("Français") }
+    val languageManager: LanguageManager = koinInject()
+    val currentLanguage by languageManager.currentLanguage.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier.semantics {
@@ -79,7 +83,7 @@ fun AccountScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        text = stringResource(Res.string.auth_my_account),
+                        text = localizedString("account_title"),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -141,7 +145,7 @@ fun AccountScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(Res.string.auth_account_information),
+                    text = localizedString("account_information"),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -152,7 +156,7 @@ fun AccountScreen(
                 )
 
                 InfoRow(
-                    label = stringResource(Res.string.auth_email),
+                    label = localizedString("auth_label_email"),
                     value = userEmail
                 )
 
@@ -175,14 +179,14 @@ fun AccountScreen(
                         modifier = Modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = stringResource(Res.string.language_settings_title),
+                            text = localizedString("account_language_selection"),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         
                         Text(
-                            text = stringResource(Res.string.language_settings_description),
+                            text = localizedString("account_language_description"),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                             modifier = Modifier.padding(bottom = 12.dp)
@@ -198,10 +202,7 @@ fun AccountScreen(
                                 modifier = Modifier.padding(end = 8.dp)
                             )
                             Text(
-                                text = stringResource(
-                                    Res.string.language_current_selection,
-                                    currentLanguage
-                                )
+                                text = languageManager.getLanguageDisplayName(currentLanguage)
                             )
                         }
                     }
@@ -222,7 +223,7 @@ fun AccountScreen(
                             contentDescription = "Bouton Changer le mot de passe"
                         }
                 ) {
-                    Text(stringResource(Res.string.auth_change_password))
+                    Text(localizedString("account_change_password"))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -249,7 +250,7 @@ fun AccountScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-                    Text(stringResource(Res.string.auth_button_disconnected))
+                    Text(localizedString("account_logout"))
                 }
             }
         }
@@ -261,7 +262,7 @@ fun AccountScreen(
             onDismissRequest = { showChangePasswordDialog = false },
             title = { 
                 Text(
-                    text = stringResource(Res.string.settings_change_password_dialog_title),
+                    text = localizedString("account_change_password_dialog_title"),
                     modifier = Modifier.semantics {
                         testTag = "change_password_dialog_title"
                     }
@@ -273,7 +274,7 @@ fun AccountScreen(
                     OutlinedTextField(
                         value = oldPassword,
                         onValueChange = { viewModel.onOldPasswordChange(it) },
-                        label = { Text(stringResource(Res.string.settings_old_password_label)) },
+                        label = { Text(localizedString("account_old_password")) },
                         visualTransformation = if (oldPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password, 
@@ -287,7 +288,7 @@ fun AccountScreen(
                                     color = MaterialTheme.colorScheme.error
                                 )
                             } else {
-                                Text(stringResource(Res.string.auth_error_password_short_hint))
+                                Text(localizedString("auth_error_password_short_hint"))
                             }
                         },
                         trailingIcon = {
@@ -314,7 +315,7 @@ fun AccountScreen(
                     OutlinedTextField(
                         value = newPassword,
                         onValueChange = { viewModel.onNewPasswordChange(it) },
-                        label = { Text(stringResource(Res.string.auth_new_password)) },
+                        label = { Text(localizedString("account_new_password")) },
                         visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password, 
@@ -328,7 +329,7 @@ fun AccountScreen(
                                     color = MaterialTheme.colorScheme.error
                                 )
                             } else {
-                                Text(stringResource(Res.string.auth_error_password_short_hint))
+                                Text(localizedString("auth_error_password_short_hint"))
                             }
                         },
                         trailingIcon = {
@@ -355,7 +356,7 @@ fun AccountScreen(
                     OutlinedTextField(
                         value = confirmNewPassword,
                         onValueChange = { viewModel.onConfirmNewPasswordChange(it) },
-                        label = { Text(stringResource(Res.string.auth_confirm_new_password)) },
+                        label = { Text(localizedString("account_confirm_new_password")) },
                         visualTransformation = if (confirmNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password, 
@@ -434,13 +435,13 @@ fun AccountScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text(stringResource(Res.string.auth_confirm))
+                        Text(localizedString("account_change_password_button"))
                     }
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showChangePasswordDialog = false }) {
-                    Text(stringResource(Res.string.common_cancel))
+                    Text(localizedString("common_cancel"))
                 }
             }
         )
@@ -450,11 +451,11 @@ fun AccountScreen(
     if (showLanguageSelectionDialog) {
         AlertDialog(
             onDismissRequest = { showLanguageSelectionDialog = false },
-            title = { Text(stringResource(Res.string.language_selection_title)) },
+            title = { Text(localizedString("language_selection_title")) },
             text = {
                 Column {
                     Text(
-                        text = stringResource(Res.string.language_settings_description),
+                        text = localizedString("account_language_description"),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -464,11 +465,13 @@ fun AccountScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                currentLanguage = "Français"
+                                coroutineScope.launch {
+                                    languageManager.setLanguage(LanguageManager.LANGUAGE_FRENCH)
+                                }
                                 showLanguageSelectionDialog = false
                             },
                         colors = CardDefaults.cardColors(
-                            containerColor = if (currentLanguage == "Français") {
+                            containerColor = if (currentLanguage == LanguageManager.LANGUAGE_FRENCH) {
                                 MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                             } else {
                                 MaterialTheme.colorScheme.surface
@@ -482,12 +485,12 @@ fun AccountScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = currentLanguage == "Français",
+                                selected = currentLanguage == LanguageManager.LANGUAGE_FRENCH,
                                 onClick = null
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = stringResource(Res.string.language_french),
+                                text = localizedString("language_french"),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -500,11 +503,13 @@ fun AccountScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                currentLanguage = "English"
+                                coroutineScope.launch {
+                                    languageManager.setLanguage(LanguageManager.LANGUAGE_ENGLISH)
+                                }
                                 showLanguageSelectionDialog = false
                             },
                         colors = CardDefaults.cardColors(
-                            containerColor = if (currentLanguage == "English") {
+                            containerColor = if (currentLanguage == LanguageManager.LANGUAGE_ENGLISH) {
                                 MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                             } else {
                                 MaterialTheme.colorScheme.surface
@@ -518,12 +523,12 @@ fun AccountScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = currentLanguage == "English",
+                                selected = currentLanguage == LanguageManager.LANGUAGE_ENGLISH,
                                 onClick = null
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = stringResource(Res.string.language_english),
+                                text = localizedString("language_english"),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -532,7 +537,7 @@ fun AccountScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showLanguageSelectionDialog = false }) {
-                    Text(stringResource(Res.string.common_cancel))
+                    Text(localizedString("common_cancel"))
                 }
             }
         )

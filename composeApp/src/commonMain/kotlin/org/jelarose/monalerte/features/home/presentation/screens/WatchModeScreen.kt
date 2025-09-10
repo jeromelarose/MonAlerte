@@ -61,6 +61,7 @@ fun WatchModeScreen(
     var showPermissionDialog by remember { mutableStateOf<Pair<String, String>?>(null) }
     var showAudioRequiredDialog by remember { mutableStateOf(false) }
     var showErrorMessage by remember { mutableStateOf<String?>(null) }
+    var showSuccessMessage by remember { mutableStateOf<String?>(null) }
     
     // Gérer les événements UI (permissions, erreurs)
     LaunchedEffect(uiEvent) {
@@ -73,6 +74,10 @@ fun WatchModeScreen(
                 is WatchModeUiEvent.ShowErrorMessage -> {
                     println("❌ WatchModeScreen: Error message: ${event.message}")
                     showErrorMessage = event.message
+                }
+                is WatchModeUiEvent.ShowMessage -> {
+                    println("✅ WatchModeScreen: Success message: ${event.messageKey}")
+                    showSuccessMessage = event.messageKey
                 }
                 WatchModeUiEvent.AudioRequiredForVideo -> {
                     println("⚠️ WatchModeScreen: Audio required for video activation")
@@ -252,12 +257,8 @@ fun WatchModeScreen(
                     modifier = Modifier.padding(top = 16.dp)
                 )
 
-                SmsConfigCard(
-                    smsTemplate = uiState.smsTemplate,
-                    onSmsTemplateChanged = { template -> 
-                        println("💬 WatchModeScreen: SMS template changed")
-                        watchModeViewModel.onSmsTemplateChanged(template) 
-                    }
+                SmsConfigurationCard(
+                    viewModel = watchModeViewModel
                 )
 
                 // Bottom spacing
@@ -302,6 +303,15 @@ fun WatchModeScreen(
             message = message,
             onDismiss = {
                 showErrorMessage = null
+            }
+        )
+    }
+    
+    showSuccessMessage?.let { messageKey ->
+        SuccessSnackbar(
+            messageKey = messageKey,
+            onDismiss = {
+                showSuccessMessage = null
             }
         )
     }
@@ -798,117 +808,6 @@ private fun ContactsCard(
     }
 }
 
-@Composable
-private fun SmsConfigCard(
-    smsTemplate: String,
-    onSmsTemplateChanged: (String) -> Unit
-) {
-    var showSmsEditor by remember { mutableStateOf(false) }
-    
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .semantics {
-                testTag = "sms_config_card"
-                contentDescription = "Configuration des messages SMS"
-            },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.2f)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "💬",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = localizedString("sms_configuration_title"),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = if (smsTemplate.isNotEmpty()) 
-                            localizedString("sms_configuration_custom")
-                        else 
-                            localizedString("sms_configuration_default"),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 20.sp
-                    )
-                }
-
-                TextButton(
-                    onClick = { showSmsEditor = true },
-                    modifier = Modifier.semantics {
-                        testTag = "sms_config_edit_button"
-                        contentDescription = "Modifier le modèle SMS"
-                    }
-                ) {
-                    Text(
-                        text = localizedString("edit_button"),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            
-            // Show current template preview if exists
-            if (smsTemplate.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Text(
-                        text = smsTemplate,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(12.dp),
-                        maxLines = 3
-                    )
-                }
-            }
-        }
-    }
-    
-    // SMS Editor Dialog
-    if (showSmsEditor) {
-        SmsTemplateEditorDialog(
-            currentTemplate = smsTemplate,
-            onTemplateChanged = onSmsTemplateChanged,
-            onDismiss = { showSmsEditor = false }
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -973,4 +872,262 @@ private fun SmsTemplateEditorDialog(
             }
         }
     )
+}
+
+@Composable
+internal fun SmsConfigurationCard(
+    viewModel: WatchModeViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    // Variables locales pour la gestion du template SMS
+    var textFieldValue by remember { mutableStateOf(uiState.smsTemplate) }
+    var hasUnsavedChanges by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
+    
+    // Placeholder bilingue - utiliser la fonction localizedString pour détecter la langue
+    val placeholderTag = if (localizedString("default_alert_sms_template").contains("{LIEN}")) "{LIEN}" else "{LINK}"
+    val defaultTemplate = localizedString("default_alert_sms_template")
+    
+    // Template effectif (par défaut ou personnalisé)
+    val effectiveTemplate = if (uiState.smsTemplate.isNotBlank()) uiState.smsTemplate else defaultTemplate
+    
+    // Mise à jour du champ de texte quand le template change
+    LaunchedEffect(effectiveTemplate) {
+        if (textFieldValue != effectiveTemplate) {
+            textFieldValue = effectiveTemplate
+        }
+    }
+    
+    // Détection des changements non sauvés
+    LaunchedEffect(textFieldValue, uiState.smsTemplate) {
+        // Le template actuellement sauvé (vide = pas encore sauvé)
+        val savedTemplate = uiState.smsTemplate
+        // Il y a des changements si le texte actuel est différent de ce qui est sauvé
+        hasUnsavedChanges = textFieldValue != savedTemplate
+    }
+    
+    // Validation du template
+    val isTemplateValid = remember(textFieldValue, placeholderTag) {
+        textFieldValue.isNotBlank() && textFieldValue.contains(placeholderTag)
+    }
+    
+    // Message de prévisualisation
+    val previewMessage = remember(textFieldValue, placeholderTag) {
+        textFieldValue.replace(placeholderTag, "https://example.com/location/12345")
+    }
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // En-tête cliquable pour expansion/contraction
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { isExpanded = !isExpanded }
+                    .padding(bottom = if (isExpanded) 16.dp else 0.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "💬",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = localizedString("sms_alert_template_title"),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    
+                    if (!isExpanded) {
+                        // En mode compact : afficher un aperçu du template actuel
+                        val currentTemplatePreview = if (effectiveTemplate.length > 50) {
+                            effectiveTemplate.take(50) + "..."
+                        } else {
+                            effectiveTemplate
+                        }
+                        Text(
+                            text = currentTemplatePreview,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    } else {
+                        Text(
+                            text = localizedString("sms_alert_template_description"),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                
+                // Indicateur d'expansion
+                Text(
+                    text = if (isExpanded) "▲" else "▼",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            // Contenu détaillé (seulement si expandé)
+            if (isExpanded) {
+                // Information sur le placeholder
+                Text(
+                    text = localizedString("sms_link_placeholder_info"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+                
+                // Champ de texte pour éditer le template
+                OutlinedTextField(
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
+                    label = { Text(localizedString("message_template_label")) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .defaultMinSize(minHeight = 100.dp),
+                    isError = !isTemplateValid,
+                    supportingText = {
+                        if (!isTemplateValid) {
+                            Text(
+                                text = localizedString("sms_template_validation_error"),
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        } else {
+                            Text(
+                                text = localizedString("sms_template_validation_success")
+                            )
+                        }
+                    },
+                    singleLine = false
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Label pour la prévisualisation
+                Text(
+                    text = localizedString("sms_template_preview_label"),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                // Card de prévisualisation du message
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+                    )
+                ) {
+                    Text(
+                        text = previewMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+                
+                // Bouton de sauvegarde (n'apparaît que s'il y a des changements)
+                if (hasUnsavedChanges) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Button(
+                        onClick = {
+                            if (isTemplateValid) {
+                                viewModel.saveSmsTemplate(textFieldValue)
+                            }
+                        },
+                        enabled = isTemplateValid,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = "✅",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(localizedString("sms_template_save_button"))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SuccessSnackbar(
+    messageKey: String,
+    onDismiss: () -> Unit
+) {
+    val message = localizedString(messageKey)
+    
+    LaunchedEffect(messageKey) {
+        // Auto-dismiss after 2 seconds
+        kotlinx.coroutines.delay(2000)
+        onDismiss()
+    }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "✅",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.weight(1f)
+                )
+                TextButton(onClick = onDismiss) {
+                    Text(
+                        text = "✖️",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+    }
 }

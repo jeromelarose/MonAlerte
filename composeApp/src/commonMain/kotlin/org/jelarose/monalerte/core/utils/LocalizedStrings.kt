@@ -184,6 +184,18 @@ object LocalizedStrings {
             "save_button" -> "Enregistrer"
             "cancel_button" -> "Annuler"
             
+            // SMS Alert Template (Watch Mode)
+            "sms_alert_template_title" -> "Modèle du SMS d'alerte"
+            "sms_alert_template_description" -> "Personnalisez le message envoyé lors d'une alerte"
+            "sms_link_placeholder_info" -> "La balise {LIEN} sera automatiquement remplacée par le lien de votre position lors de l'envoi du SMS d'alerte."
+            "message_template_label" -> "Modèle du message"
+            "sms_template_validation_error" -> "Le modèle doit contenir la balise {LIEN}"
+            "sms_template_validation_success" -> "La balise {LIEN} sera remplacée par votre position"
+            "sms_template_preview_label" -> "Message que recevront vos contacts :"
+            "sms_template_save_button" -> "Enregistrer les modifications"
+            "sms_template_saved_message" -> "Template SMS enregistré"
+            "default_alert_sms_template" -> "ALERTE : Un problème a été détecté. Suivez la situation en temps réel ici : {LIEN}"
+            
             else -> key // Fallback to key if not found
         }
     }
@@ -356,6 +368,18 @@ object LocalizedStrings {
             "edit_button" -> "Edit"
             "save_button" -> "Save"
             "cancel_button" -> "Cancel"
+            
+            // SMS Alert Template (Watch Mode)
+            "sms_alert_template_title" -> "Alert SMS template"
+            "sms_alert_template_description" -> "Customize the message sent during an alert"
+            "sms_link_placeholder_info" -> "The {LINK} tag will be automatically replaced by your position link when sending the alert SMS."
+            "message_template_label" -> "Message template"
+            "sms_template_validation_error" -> "Template must contain the {LINK} tag"
+            "sms_template_validation_success" -> "The {LINK} tag will be replaced by your position"
+            "sms_template_preview_label" -> "Message your contacts will receive:"
+            "sms_template_save_button" -> "Save changes"
+            "sms_template_saved_message" -> "SMS Template saved"
+            "default_alert_sms_template" -> "ALERT: A problem has been detected. Follow the situation in real-time here: {LINK}"
             
             else -> key // Fallback to key if not found
         }

@@ -40,6 +40,7 @@ enum class SmsTemplateType {
 sealed class WatchModeUiEvent {
     data class ShowPermissionDialog(val permission: String, val reason: String) : WatchModeUiEvent()
     data class ShowErrorMessage(val message: String) : WatchModeUiEvent()
+    data class ShowMessage(val messageKey: String) : WatchModeUiEvent()
     object AudioRequiredForVideo : WatchModeUiEvent()
 }
 
@@ -295,6 +296,19 @@ class WatchModeViewModel(
         _uiState.value = _uiState.value.copy(smsTemplate = template)
         viewModelScope.launch {
             dataStore.setWatchModeSmsTemplate(template)
+        }
+    }
+    
+    /**
+     * Save SMS template and show confirmation message
+     */
+    fun saveSmsTemplate(template: String) {
+        println("💬 WatchModeViewModel: Saving SMS template")
+        _uiState.value = _uiState.value.copy(smsTemplate = template)
+        viewModelScope.launch {
+            dataStore.setWatchModeSmsTemplate(template)
+            // Show success message via UI event
+            _uiEvents.value = WatchModeUiEvent.ShowMessage("sms_template_saved_message")
         }
     }
     

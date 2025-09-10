@@ -124,4 +124,26 @@
     <string name="interface_menu_location_history_description">Consultez votre historique de déplacements et analysez vos trajets</string>
     <string name="interface_menu_old_watch_mode_title">Ancien Mode Veille</string>
     <string name="mode_standby_description">Interface classique de veille avec contrôles manuels</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_back">Retour</string>
+    
+    <!-- Settings Items -->
+    <string name="settings_account_title">Mon Compte</string>
+    <string name="settings_account_description">Gérer les informations de votre compte.</string>
+    <string name="settings_emergency_contacts_title">Contacts d'Urgence</string>
+    <string name="settings_emergency_contacts_description">Configurer les listes de contacts à alerter.</string>
+    <string name="settings_shortcuts_title">Raccourcis d'Urgence</string>
+    <string name="settings_shortcuts_description">Activer et configurer les raccourcis volume.</string>
+    <string name="settings_permissions_title">Permissions de l'Application</string>
+    <string name="settings_permissions_description">Gérer les autorisations requises par l'application.</string>
+    <string name="settings_sms_alert_title">Message d'Alerte SMS</string>
+    <string name="settings_sms_alert_description">Personnaliser le message envoyé en cas d'alerte.</string>
+    <string name="settings_widget_config_title">Configuration du Widget d'Alerte</string>
+    <string name="settings_widget_config_description">Aide pour ajouter et configurer le widget d'alerte rapide.</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_description">Configurer les préférences de notification.</string>
+    <string name="settings_privacy_policy_title">Politique de Confidentialité</string>
+    <string name="settings_privacy_policy_description">Consulter notre politique de confidentialité.</string>
 </resources>

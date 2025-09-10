@@ -124,4 +124,26 @@
     <string name="interface_menu_location_history_description">View your movement history and analyze your routes</string>
     <string name="interface_menu_old_watch_mode_title">Legacy Watch Mode</string>
     <string name="mode_standby_description">Classic watch interface with manual controls</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_back">Back</string>
+    
+    <!-- Settings Items -->
+    <string name="settings_account_title">My Account</string>
+    <string name="settings_account_description">Manage your account information.</string>
+    <string name="settings_emergency_contacts_title">Emergency Contacts</string>
+    <string name="settings_emergency_contacts_description">Configure contact lists to alert.</string>
+    <string name="settings_shortcuts_title">Emergency Shortcuts</string>
+    <string name="settings_shortcuts_description">Enable and configure volume shortcuts.</string>
+    <string name="settings_permissions_title">Application Permissions</string>
+    <string name="settings_permissions_description">Manage permissions required by the application.</string>
+    <string name="settings_sms_alert_title">SMS Alert Message</string>
+    <string name="settings_sms_alert_description">Customize the message sent in case of alert.</string>
+    <string name="settings_widget_config_title">Alert Widget Configuration</string>
+    <string name="settings_widget_config_description">Help to add and configure the quick alert widget.</string>
+    <string name="settings_notifications_title">Notifications</string>
+    <string name="settings_notifications_description">Configure notification preferences.</string>
+    <string name="settings_privacy_policy_title">Privacy Policy</string>
+    <string name="settings_privacy_policy_description">View our privacy policy.</string>
 </resources>

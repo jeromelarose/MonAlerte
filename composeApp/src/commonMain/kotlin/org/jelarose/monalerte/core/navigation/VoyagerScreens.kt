@@ -15,6 +15,7 @@ import org.jelarose.monalerte.features.auth.presentation.screens.SharedRegisterS
 import org.jelarose.monalerte.features.auth.presentation.screens.SharedForgotPasswordScreen
 import org.jelarose.monalerte.features.test.presentation.TestScreen
 import org.jelarose.monalerte.features.home.presentation.screens.InterfaceMenuScreen
+import org.jelarose.monalerte.features.settings.presentation.SettingsScreen
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
 import org.jelarose.monalerte.core.policy.PolicyManager
@@ -241,33 +242,46 @@ object TestScreen : Screen {
 }
 
 object SettingsScreen : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         
-        androidx.compose.material3.Scaffold(
-            topBar = {
-                androidx.compose.material3.TopAppBar(
-                    title = { androidx.compose.material3.Text("Paramètres") },
-                    navigationIcon = {
-                        androidx.compose.material3.IconButton(onClick = { navigator.pop() }) {
-                            androidx.compose.material3.Text("←")
-                        }
-                    }
-                )
+        SettingsScreen(
+            onBackClick = { 
+                navigator.pop()
+            },
+            onAccountClick = { 
+                // TODO: Navigation vers écran de compte
+                navigator.push(TestScreen)
+            },
+            onEmergencyContactsClick = { 
+                // TODO: Navigation vers écran contacts d'urgence
+                navigator.push(TestScreen)
+            },
+            onShortcutsClick = { 
+                // TODO: Navigation vers écran raccourcis
+                navigator.push(TestScreen)
+            },
+            onPermissionsClick = { 
+                // TODO: Navigation vers écran permissions
+                navigator.push(TestScreen)
+            },
+            onSmsAlertClick = { 
+                // TODO: Navigation vers écran SMS
+                navigator.push(TestScreen)
+            },
+            onWidgetConfigClick = { 
+                // TODO: Navigation vers écran widget
+                navigator.push(TestScreen)
+            },
+            onNotificationsClick = { 
+                // TODO: Navigation vers écran notifications
+                navigator.push(TestScreen)
+            },
+            onPrivacyPolicyClick = { 
+                // Réutiliser l'écran de politique de confidentialité existant
+                navigator.push(PrivacyPolicyScreen)
             }
-        ) { paddingValues ->
-            androidx.compose.foundation.layout.Column(
-                modifier = androidx.compose.ui.Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-            ) {
-                androidx.compose.material3.Text("Écran de paramètres")
-                androidx.compose.foundation.layout.Spacer(modifier = androidx.compose.ui.Modifier.height(16.dp))
-                androidx.compose.material3.Text("TODO: Ajouter les paramètres de l'application")
-            }
-        }
+        )
     }
 }

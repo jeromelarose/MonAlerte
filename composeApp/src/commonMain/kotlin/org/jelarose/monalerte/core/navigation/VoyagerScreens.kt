@@ -42,8 +42,11 @@ object StartupScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val policyManager: PolicyManager = koinInject()
+        val authViewModel: SharedAuthViewModel = koinInject()
         
         val policyState by policyManager.policyState.collectAsState()
+        var authChecked by remember { mutableStateOf(false) }
+        var isAuthenticated by remember { mutableStateOf(false) }
         
         LaunchedEffect(Unit) {
             policyManager.checkPolicyStatus()
@@ -77,9 +80,37 @@ object StartupScreen : Screen {
                 }
             }
             is PolicyState.Accepted -> {
-                // Politique acceptée, aller au login
-                LaunchedEffect(Unit) {
-                    navigator.replace(LoginScreen)
+                // Politique acceptée, vérifier l'authentification avant d'aller au login
+                if (!authChecked) {
+                    LaunchedEffect(Unit) {
+                        authViewModel.checkExistingAuthentication { authenticated ->
+                            isAuthenticated = authenticated
+                            authChecked = true
+                        }
+                    }
+                    
+                    // Afficher un écran de chargement pendant la vérification
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            CircularProgressIndicator()
+                            Text("Vérification de la session...")
+                        }
+                    }
+                } else {
+                    // Une fois l'auth vérifiée, naviguer vers la bonne destination
+                    LaunchedEffect(Unit) {
+                        if (isAuthenticated) {
+                            navigator.replace(InterfaceMenuVoyagerScreen)
+                        } else {
+                            navigator.replace(LoginScreen)
+                        }
+                    }
                 }
             }
             is PolicyState.Required -> {
@@ -121,16 +152,6 @@ object LoginScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val authViewModel: SharedAuthViewModel = koinInject()
-        
-        // Vérifier si l'utilisateur est déjà connecté au démarrage
-        LaunchedEffect(Unit) {
-            authViewModel.checkExistingAuthentication { isAuthenticated ->
-                if (isAuthenticated) {
-                    // Si déjà connecté, aller directement au menu principal
-                    navigator.replace(InterfaceMenuVoyagerScreen)
-                }
-            }
-        }
         
         SharedLoginScreen(
             viewModel = authViewModel,

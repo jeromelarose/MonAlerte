@@ -15,6 +15,7 @@ import org.jelarose.monalerte.features.auth.presentation.screens.SharedRegisterS
 import org.jelarose.monalerte.features.auth.presentation.screens.SharedForgotPasswordScreen
 import org.jelarose.monalerte.features.test.presentation.TestScreen
 import org.jelarose.monalerte.features.home.presentation.screens.InterfaceMenuScreen
+import org.jelarose.monalerte.features.home.presentation.screens.WatchModeScreen
 import org.jelarose.monalerte.features.settings.presentation.SettingsScreen
 import org.jelarose.monalerte.features.auth.presentation.screens.AccountScreen
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
@@ -226,8 +227,8 @@ object InterfaceMenuVoyagerScreen : Screen {
                 navigator.push(TestScreen)
             },
             onVeille2Click = { 
-                // TODO: Navigation vers nouveau mode veille
-                navigator.push(TestScreen)
+                // Navigation vers nouveau mode veille
+                navigator.push(WatchModeVoyagerScreen)
             },
             onAddressSelectionClick = { 
                 // TODO: Navigation vers gestion des lieux
@@ -336,6 +337,22 @@ object AccountVoyagerScreen : Screen {
             },
             onLogoutSuccess = {
                 navigator.replaceAll(StartupScreen)
+            }
+        )
+    }
+}
+
+object WatchModeVoyagerScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        
+        WatchModeScreen(
+            onBackClick = { 
+                navigator.pop()
+            },
+            onSettingsClick = { 
+                navigator.push(SettingsScreen)
             }
         )
     }

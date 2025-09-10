@@ -3,6 +3,7 @@ package org.jelarose.monalerte.features.auth.data.repository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import org.jelarose.monalerte.core.utils.SharedDataStore
+import org.jelarose.monalerte.core.storage.SecureStorage
 import org.jelarose.monalerte.features.auth.data.api.AuthApiService
 import org.jelarose.monalerte.features.auth.data.database.AuthDao
 import org.jelarose.monalerte.features.auth.data.database.AuthTokenEntity
@@ -14,7 +15,8 @@ import kotlinx.datetime.Clock
 class AuthRepositoryImpl(
     private val authApiService: AuthApiService,
     private val authDao: AuthDao,
-    private val sharedDataStore: SharedDataStore
+    private val sharedDataStore: SharedDataStore,
+    private val secureStorage: SecureStorage
 ) : AuthRepository {
     
     companion object {
@@ -90,8 +92,17 @@ class AuthRepositoryImpl(
         }
     }
     
-    // Local storage operations - Room Database
+    // Local storage operations - Room Database + Secure Storage
     override suspend fun saveAuthToken(token: String, userEmail: String) {
+        // Sauvegarder d'abord dans le stockage sécurisé (priorité)
+        try {
+            secureStorage.store(KEY_JWT_TOKEN, token)
+            secureStorage.store(KEY_USER_EMAIL, userEmail)
+        } catch (e: Exception) {
+            // En cas d'erreur, continuer avec les anciens systèmes
+        }
+        
+        // Conserver aussi l'ancienne méthode pour compatibilité
         val authEntity = AuthTokenEntity(
             jwtToken = token,
             userEmail = userEmail,
@@ -101,16 +112,35 @@ class AuthRepositoryImpl(
     }
     
     override suspend fun getAuthToken(): String? {
-        return authDao.getAuthToken()?.jwtToken?.takeIf { it.isNotEmpty() }
-            ?: sharedDataStore.getString(KEY_JWT_TOKEN)?.takeIf { it.isNotEmpty() }
+        // Priorité: Stockage sécurisé > Room > DataStore
+        return try {
+            secureStorage.retrieve(KEY_JWT_TOKEN)?.takeIf { it.isNotEmpty() }
+        } catch (e: Exception) {
+            null
+        } ?: authDao.getAuthToken()?.jwtToken?.takeIf { it.isNotEmpty() }
+          ?: sharedDataStore.getString(KEY_JWT_TOKEN)?.takeIf { it.isNotEmpty() }
     }
     
     override suspend fun getUserEmail(): String? {
-        return authDao.getAuthToken()?.userEmail?.takeIf { it.isNotEmpty() }
-            ?: sharedDataStore.getString(KEY_USER_EMAIL)?.takeIf { it.isNotEmpty() }
+        // Priorité: Stockage sécurisé > Room > DataStore
+        return try {
+            secureStorage.retrieve(KEY_USER_EMAIL)?.takeIf { it.isNotEmpty() }
+        } catch (e: Exception) {
+            null
+        } ?: authDao.getAuthToken()?.userEmail?.takeIf { it.isNotEmpty() }
+          ?: sharedDataStore.getString(KEY_USER_EMAIL)?.takeIf { it.isNotEmpty() }
     }
     
     override suspend fun clearAuthToken() {
+        // Nettoyer tous les stockages pour sécurité maximale
+        try {
+            secureStorage.remove(KEY_JWT_TOKEN)
+            secureStorage.remove(KEY_USER_EMAIL)
+        } catch (e: Exception) {
+            // Continuer même si le stockage sécurisé échoue
+        }
+        
+        // Nettoyer aussi les anciens systèmes
         authDao.clearAuthToken()
         sharedDataStore.removeKey(KEY_JWT_TOKEN)
         sharedDataStore.removeKey(KEY_USER_EMAIL)
@@ -118,7 +148,14 @@ class AuthRepositoryImpl(
     }
     
     override suspend fun hasValidToken(): Boolean {
-        return authDao.hasValidToken() || !sharedDataStore.getString(KEY_JWT_TOKEN).isNullOrEmpty()
+        // Vérifier dans tous les stockages disponibles
+        val hasSecureToken = try {
+            !secureStorage.retrieve(KEY_JWT_TOKEN).isNullOrEmpty()
+        } catch (e: Exception) {
+            false
+        }
+        
+        return hasSecureToken || authDao.hasValidToken() || !sharedDataStore.getString(KEY_JWT_TOKEN).isNullOrEmpty()
     }
     
     override fun getAuthTokenFlow(): Flow<AuthTokenEntity?> {

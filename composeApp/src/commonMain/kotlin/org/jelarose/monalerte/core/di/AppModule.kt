@@ -20,6 +20,7 @@ import org.jelarose.monalerte.features.auth.presentation.viewmodels.AuthViewMode
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
 import org.jelarose.monalerte.core.utils.LanguageManager
 import org.jelarose.monalerte.core.policy.PolicyManager
+import org.jelarose.monalerte.core.storage.SecureStorage
 import io.ktor.client.*
 
 /**
@@ -50,17 +51,20 @@ val appModule = module {
     // Policy Manager - Singleton
     single { PolicyManager(get()) }
     
+    // Secure Storage - Singleton
+    single { SecureStorage() }
+    
     // Authentication - API Service
     single<AuthApiService> { AuthApiService(get()) }
     
     // Authentication - Repository
     single<AuthRepository> { 
-        AuthRepositoryImpl(get<AuthApiService>(), get<AppDatabase>().authDao(), get<SharedDataStore>()) 
+        AuthRepositoryImpl(get<AuthApiService>(), get<AppDatabase>().authDao(), get<SharedDataStore>(), get<SecureStorage>()) 
     }
     
     // Also register AuthRepositoryImpl directly for cases where it's needed
     single<AuthRepositoryImpl> { 
-        AuthRepositoryImpl(get<AuthApiService>(), get<AppDatabase>().authDao(), get<SharedDataStore>()) 
+        AuthRepositoryImpl(get<AuthApiService>(), get<AppDatabase>().authDao(), get<SharedDataStore>(), get<SecureStorage>()) 
     }
     
     // Authentication - Use Cases

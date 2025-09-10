@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kermit)
             implementation(libs.konform)
+            implementation(libs.kvault)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

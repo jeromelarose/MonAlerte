@@ -14,6 +14,7 @@ import org.jelarose.monalerte.features.auth.presentation.screens.SharedLoginScre
 import org.jelarose.monalerte.features.auth.presentation.screens.SharedRegisterScreen
 import org.jelarose.monalerte.features.auth.presentation.screens.SharedForgotPasswordScreen
 import org.jelarose.monalerte.features.test.presentation.TestScreen
+import org.jelarose.monalerte.features.home.presentation.screens.InterfaceMenuScreen
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
 import org.jelarose.monalerte.core.policy.PolicyManager
@@ -122,7 +123,7 @@ object LoginScreen : Screen {
             viewModel = authViewModel,
             onLoginSuccess = { 
                 // Remplacer par l'écran principal après login réussi
-                navigator.replace(HomeScreen) 
+                navigator.replace(InterfaceMenuVoyagerScreen) 
             },
             onSwitchToRegister = { 
                 // Pousser l'écran d'inscription
@@ -166,6 +167,40 @@ object ForgotPasswordScreen : Screen {
             onBack = { 
                 // Retour à l'écran de login
                 navigator.pop() 
+            }
+        )
+    }
+}
+
+object InterfaceMenuVoyagerScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        
+        InterfaceMenuScreen(
+            onSuiviPositionClick = { 
+                // TODO: Navigation vers écran de suivi de position
+                navigator.push(TestScreen)
+            },
+            onVeilleClick = { 
+                // TODO: Navigation vers ancien mode veille
+                navigator.push(TestScreen)
+            },
+            onVeille2Click = { 
+                // TODO: Navigation vers nouveau mode veille
+                navigator.push(TestScreen)
+            },
+            onAddressSelectionClick = { 
+                // TODO: Navigation vers gestion des lieux
+                navigator.push(TestScreen)
+            },
+            onLocationHistoryClick = { 
+                // TODO: Navigation vers historique de position
+                navigator.push(TestScreen)
+            },
+            onSettingsClick = { 
+                // Navigation vers les paramètres
+                navigator.push(SettingsScreen)
             }
         )
     }

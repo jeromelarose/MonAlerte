@@ -29,14 +29,14 @@ class VoyagerMigrationTest : FunSpec({
         val testScreen = TestScreen
         val settingsScreen = SettingsScreen
         
-        // Tous les écrans devraient être définis
-        privacyScreen shouldNotBeNull
-        loginScreen shouldNotBeNull
-        registerScreen shouldNotBeNull
-        forgotPasswordScreen shouldNotBeNull
-        homeScreen shouldNotBeNull
-        testScreen shouldNotBeNull
-        settingsScreen shouldNotBeNull
+        // Tous les écrans devraient être définis (test d'existence)
+        privacyScreen.toString() shouldNotBe ""
+        loginScreen.toString() shouldNotBe ""
+        registerScreen.toString() shouldNotBe ""
+        forgotPasswordScreen.toString() shouldNotBe ""
+        homeScreen.toString() shouldNotBe ""
+        testScreen.toString() shouldNotBe ""
+        settingsScreen.toString() shouldNotBe ""
     }
     
     test("Voyager screens should implement Screen interface") {
@@ -77,7 +77,7 @@ class VoyagerMigrationTest : FunSpec({
         
         // StableNavController devrait être instanciable même si deprecated
         val controller = StableNavController()
-        controller shouldNotBeNull
+        controller.toString() shouldNotBe ""
         controller.currentScreen shouldBe Screen.PrivacyPolicy
     }
     

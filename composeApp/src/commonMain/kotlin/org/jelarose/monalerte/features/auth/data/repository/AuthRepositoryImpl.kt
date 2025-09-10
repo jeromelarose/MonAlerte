@@ -29,7 +29,7 @@ class AuthRepositoryImpl(
         private const val KEY_JWT_TOKEN = "jwt_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_APP_LANGUAGE = "app_language"
-        private const val KEY_POLICY_VERSION = "policy_version"
+        private const val KEY_POLICY_VERSION = "accepted_policy_version"
     }
     
     // Network operations

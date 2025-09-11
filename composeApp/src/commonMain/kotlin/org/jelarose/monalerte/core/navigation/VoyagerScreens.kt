@@ -20,6 +20,7 @@ import org.jelarose.monalerte.features.settings.presentation.SettingsScreen
 import org.jelarose.monalerte.features.auth.presentation.screens.AccountScreen
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.SharedAuthViewModel
 import org.jelarose.monalerte.features.auth.presentation.viewmodels.AccountViewModel
+import org.jelarose.monalerte.features.contacts.presentation.screens.ContactScreen
 import org.jelarose.monalerte.features.test.presentation.TestViewModel
 import org.jelarose.monalerte.core.policy.PolicyManager
 import org.jelarose.monalerte.core.policy.PolicyState
@@ -357,6 +358,10 @@ object WatchModeVoyagerScreen : Screen {
             onSettingsClick = { 
                 println("🚀 WatchModeVoyagerScreen: Settings clicked")
                 navigator.push(SettingsScreen)
+            },
+            onNavigateToContacts = {
+                println("🚀 WatchModeVoyagerScreen: Navigate to contacts clicked")
+                navigator.push(ContactScreen(contactType = "PARAMETER"))
             }
         )
     }

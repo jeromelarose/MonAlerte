@@ -196,6 +196,49 @@ object LocalizedStrings {
             "sms_template_saved_message" -> "Template SMS enregistré"
             "default_alert_sms_template" -> "ALERTE : Un problème a été détecté. Suivez la situation en temps réel ici : {LIEN}"
             
+            // Contact management strings
+            "contact_type_itinerary" -> "Navigation et alertes d'itinéraire"
+            "contact_type_manual_alert" -> "Alertes d'urgence manuelles"
+            "contact_type_share" -> "Partage de localisation"
+            "contact_type_accident" -> "Détection d'accident"
+            "contact_type_shake" -> "Détection de secousse"
+            "no_contact_lists" -> "Aucune liste de contacts"
+            "contact_count" -> "%s contacts"
+            "add_contact_list" -> "Ajouter une liste"
+            "list_name" -> "Nom de la liste"
+            "add" -> "Ajouter"
+            "cancel" -> "Annuler"
+            "confirm_delete" -> "Confirmer la suppression"
+            "confirm_delete_list" -> "Voulez-vous vraiment supprimer cette liste?"
+            "delete" -> "Supprimer"
+            "dismiss" -> "Fermer"
+            "contact_name" -> "Nom"
+            "contact_phone" -> "Téléphone"
+            "save_contact" -> "Enregistrer"
+            "edit_contact" -> "Modifier le contact"
+            "add_contact" -> "Ajouter un contact"
+            "import_from_phone" -> "Importer du téléphone"
+            "select_contacts" -> "Sélectionner des contacts"
+            "import_selected" -> "Importer la sélection"
+            "no_contacts" -> "Aucun contact dans cette liste"
+            "confirm_delete_contact" -> "Voulez-vous vraiment supprimer ce contact?"
+            "contact_already_in_list" -> "Ce contact est déjà dans la liste"
+            "select_all" -> "Tout sélectionner"
+            
+            // Contact picker strings from original
+            "contact_picker_title_text" -> "Importer des contacts"
+            "contact_picker_search_label_text" -> "Rechercher"
+            "contact_picker_cancel_button_text" -> "Annuler"
+            "contact_picker_import_button_text" -> "Importer"
+            
+            // Contact editor strings from original
+            "contact_editor_new_contact_title" -> "Nouveau contact"
+            "contact_editor_edit_contact_title" -> "Modifier le contact"
+            "contact_editor_name_label_text" -> "Nom"
+            "contact_editor_phone_label_text" -> "Téléphone"
+            "contact_editor_phone_error_text" -> "Format : +33 6 12 34 56 78 ou 06 12 34 56 78"
+            "contact_editor_save_button_text" -> "Enregistrer"
+            
             else -> key // Fallback to key if not found
         }
     }
@@ -380,6 +423,49 @@ object LocalizedStrings {
             "sms_template_save_button" -> "Save changes"
             "sms_template_saved_message" -> "SMS Template saved"
             "default_alert_sms_template" -> "ALERT: A problem has been detected. Follow the situation in real-time here: {LINK}"
+            
+            // Contact management strings
+            "contact_type_itinerary" -> "Navigation & Route Alerts"
+            "contact_type_manual_alert" -> "Manual Emergency Alerts"
+            "contact_type_share" -> "Location Sharing"
+            "contact_type_accident" -> "Accident Detection"
+            "contact_type_shake" -> "Shake Detection"
+            "no_contact_lists" -> "No contact lists"
+            "contact_count" -> "%s contacts"
+            "add_contact_list" -> "Add a list"
+            "list_name" -> "List name"
+            "add" -> "Add"
+            "cancel" -> "Cancel"
+            "confirm_delete" -> "Confirm deletion"
+            "confirm_delete_list" -> "Do you really want to delete this list?"
+            "delete" -> "Delete"
+            "dismiss" -> "Dismiss"
+            "contact_name" -> "Name"
+            "contact_phone" -> "Phone"
+            "save_contact" -> "Save"
+            "edit_contact" -> "Edit contact"
+            "add_contact" -> "Add contact"
+            "import_from_phone" -> "Import from phone"
+            "select_contacts" -> "Select contacts"
+            "import_selected" -> "Import selected"
+            "no_contacts" -> "No contacts in this list"
+            "confirm_delete_contact" -> "Do you really want to delete this contact?"
+            "contact_already_in_list" -> "This contact is already in the list"
+            "select_all" -> "Select all"
+            
+            // Contact picker strings from original
+            "contact_picker_title_text" -> "Import contacts"
+            "contact_picker_search_label_text" -> "Search"
+            "contact_picker_cancel_button_text" -> "Cancel"
+            "contact_picker_import_button_text" -> "Import"
+            
+            // Contact editor strings from original
+            "contact_editor_new_contact_title" -> "New contact"
+            "contact_editor_edit_contact_title" -> "Edit contact"
+            "contact_editor_name_label_text" -> "Name"
+            "contact_editor_phone_label_text" -> "Phone"
+            "contact_editor_phone_error_text" -> "Format: +33 6 12 34 56 78 or 06 12 34 56 78"
+            "contact_editor_save_button_text" -> "Save"
             
             else -> key // Fallback to key if not found
         }

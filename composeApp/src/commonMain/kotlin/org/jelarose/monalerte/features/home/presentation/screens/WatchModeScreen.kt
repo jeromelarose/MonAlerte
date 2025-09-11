@@ -41,7 +41,8 @@ import dev.icerock.moko.permissions.compose.BindEffect
 @Composable
 fun WatchModeScreen(
     onBackClick: () -> Unit = {},
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onNavigateToContacts: (() -> Unit)? = null
 ) {
     println("🔧 WatchModeScreen: Composing WatchModeScreen")
     
@@ -245,8 +246,11 @@ fun WatchModeScreen(
                 )
 
                 ContactsCard(
-                    contactsCount = 0, // TODO: Connect to contacts data
-                    onManageContacts = { /* TODO: Navigate to ContactActivity */ }
+                    contactsCount = uiState.selectedContactsCount,
+                    onManageContacts = { 
+                        // Navigate to contacts screen with PARAMETER type (for manual alerts)
+                        onNavigateToContacts?.invoke()
+                    }
                 )
 
                 // SMS Management Section

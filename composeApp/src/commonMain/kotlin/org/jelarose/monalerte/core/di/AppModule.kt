@@ -25,6 +25,9 @@ import org.jelarose.monalerte.core.utils.LanguageManager
 import org.jelarose.monalerte.core.policy.PolicyManager
 import org.jelarose.monalerte.core.storage.SecureStorage
 import org.jelarose.monalerte.features.auth.data.store.SmartAuthCache
+import org.jelarose.monalerte.features.contacts.data.repository.ContactRepositoryImpl
+import org.jelarose.monalerte.features.contacts.domain.repository.ContactRepository
+import org.jelarose.monalerte.features.contacts.presentation.viewmodel.ContactListViewModel
 import io.ktor.client.*
 
 /**
@@ -48,6 +51,11 @@ val appModule = module {
     
     // Repository - Singleton  
     singleOf(::ToggleRepository)
+    
+    // Contact Repository - Singleton
+    single<ContactRepository> { 
+        ContactRepositoryImpl(get<AppDatabase>().contactDao()) 
+    }
     
     // Language Manager - Singleton
     single { LanguageManager(get()) }
@@ -97,7 +105,8 @@ val appModule = module {
     factory { AuthViewModel(get(), get(), get(), get()) }
     factory { SharedAuthViewModel(get(), get(), get(), get(), get()) }
     factory { AccountViewModel(get<AuthRepositoryImpl>(), get()) }
+    factory { ContactListViewModel(get()) }
     
     // WatchModeViewModel - Singleton pour éviter les boucles de recomposition
-    single { WatchModeViewModel(get(), get()) }
+    single { WatchModeViewModel(get(), get(), get()) }
 }

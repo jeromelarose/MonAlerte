@@ -12,6 +12,7 @@ import org.jelarose.monalerte.features.home.domain.MediaPermissionManager
 import org.jelarose.monalerte.features.home.domain.WatchModeMediaLogic
 import org.jelarose.monalerte.features.home.domain.MokoMediaPermissionManager
 import org.jelarose.monalerte.features.home.domain.MediaPermissionResult
+import org.jelarose.monalerte.features.contacts.domain.repository.ContactRepository
 
 /**
  * Security options available for watch mode configuration
@@ -61,6 +62,7 @@ data class WatchModeUiState(
     // SMS Configuration
     val smsTemplate: String = "",
     val emergencyContacts: List<String> = emptyList(),
+    val selectedContactsCount: Int = 0,
     
     // Permission states (temps réel)
     val hasAudioPermission: Boolean = false,
@@ -80,7 +82,8 @@ data class WatchModeUiState(
  */
 class WatchModeViewModel(
     private val dataStore: SharedDataStore,
-    private val permissionManager: MediaPermissionManager
+    private val permissionManager: MediaPermissionManager,
+    private val contactRepository: ContactRepository
 ) : SimpleViewModel() {
     
     private val _uiState = MutableStateFlow(WatchModeUiState())
@@ -99,6 +102,7 @@ class WatchModeViewModel(
             loadWatchModeState()
         }
         observePermissionChanges()
+        observeContactsCount()
     }
     
     /**
@@ -117,6 +121,20 @@ class WatchModeViewModel(
                     isVideoToggleEnabled = _uiState.value.isAudioRecordingEnabled && hasAudio
                 )
             }.collect { }
+        }
+    }
+    
+    /**
+     * Observer le nombre de contacts sélectionnés pour les alertes manuelles
+     */
+    private fun observeContactsCount() {
+        viewModelScope.launch {
+            contactRepository.getSelectedContactsByType("PARAMETER")
+                .collect { contacts ->
+                    _uiState.value = _uiState.value.copy(
+                        selectedContactsCount = contacts.size
+                    )
+                }
         }
     }
     

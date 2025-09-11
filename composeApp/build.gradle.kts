@@ -61,6 +61,8 @@ kotlin {
             implementation(libs.voyager.transitions)
             implementation(libs.moko.permissions)
             implementation(libs.moko.permissions.compose)
+            implementation(libs.kmpEssentials)
+            implementation(libs.androidx.fragment)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
